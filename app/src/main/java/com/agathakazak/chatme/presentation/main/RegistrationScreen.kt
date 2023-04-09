@@ -1,5 +1,7 @@
 package com.agathakazak.chatme.presentation
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -19,16 +21,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
+import com.agathakazak.chatme.domain.User
+import com.agathakazak.chatme.presentation.main.MainViewModel
 
 
 @Composable
-fun RegistrationScreen(
-    onClickListener: () -> Unit
-) {
+fun RegistrationScreen(context: Context) {
+    val viewModel:MainViewModel = viewModel()
     var firstName by rememberSaveable { mutableStateOf("") }
     var lastName by rememberSaveable { mutableStateOf("") }
     var phoneNumber by rememberSaveable { mutableStateOf("") }
@@ -40,7 +43,6 @@ fun RegistrationScreen(
     var repeatedPassword by rememberSaveable { mutableStateOf("") }
     var repeatedPasswordHidden by rememberSaveable { mutableStateOf(true) }
     var passwordError by rememberSaveable { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -175,7 +177,12 @@ fun RegistrationScreen(
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
         OutlinedButton(
-            onClick = { onClickListener() },
+            onClick = {
+                registerUser(
+                    viewModel,
+                    User(firstName, lastName, phoneNumber, email, password)
+                )
+            },
             modifier = Modifier
                 .padding(top = 80.dp)
                 .fillMaxWidth(),
@@ -184,5 +191,9 @@ fun RegistrationScreen(
         }
     }
 
+}
+
+private fun registerUser(viewModel: MainViewModel, user: User) {
+    viewModel.registerUser(user)
 }
 

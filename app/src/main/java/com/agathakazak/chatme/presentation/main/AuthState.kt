@@ -1,4 +1,4 @@
-package com.agathakazak.chatme.presentation
+package com.agathakazak.chatme.presentation.main
 
 sealed class AuthState {
     object Initial: AuthState()
