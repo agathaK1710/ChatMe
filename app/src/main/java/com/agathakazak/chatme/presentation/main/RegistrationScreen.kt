@@ -1,7 +1,8 @@
-package com.agathakazak.chatme.presentation
+package com.agathakazak.chatme.presentation.main
 
 import android.content.Context
-import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -12,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
@@ -20,13 +22,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.User
-import com.agathakazak.chatme.presentation.main.MainViewModel
 
 
 @Composable
@@ -46,25 +46,23 @@ fun RegistrationScreen(context: Context) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(30.dp),
+            .background(MaterialTheme.colors.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            "Registration",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 30.dp, top = 30.dp),
-            fontSize = 50.sp,
-            fontFamily = FontFamily(listOf(Font(R.font.cormorant_variable_font))),
-            textAlign = TextAlign.Center
+        Image(
+            painter = painterResource(id = R.drawable.registration),
+            contentDescription = "Registration icon",
+            modifier = Modifier.width(300.dp).padding(40.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant)
         )
-        Spacer(modifier = Modifier.padding(8.dp))
         TextField(
             value = firstName,
             onValueChange = { firstName = it },
             label = { Text(text = "First name") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
         Spacer(modifier = Modifier.padding(8.dp))
@@ -73,7 +71,9 @@ fun RegistrationScreen(context: Context) {
             onValueChange = { lastName = it },
             label = { Text(text = "Last name") },
             singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
         Spacer(modifier = Modifier.padding(8.dp))
@@ -92,7 +92,8 @@ fun RegistrationScreen(context: Context) {
                 .semantics {
                     if (phoneError) error("Phone number format is invalid")
                 }
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
         Spacer(modifier = Modifier.padding(8.dp))
@@ -111,7 +112,8 @@ fun RegistrationScreen(context: Context) {
                 .semantics {
                     if (emailError) error("Email format is invalid")
                 }
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
         Spacer(modifier = Modifier.padding(8.dp))
@@ -140,7 +142,8 @@ fun RegistrationScreen(context: Context) {
                 .semantics {
                     if (emailError) error("Email format is invalid")
                 }
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
 
@@ -173,21 +176,30 @@ fun RegistrationScreen(context: Context) {
                 .semantics {
                     if (emailError) error("Email format is invalid")
                 }
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        OutlinedButton(
+        TextButton(
             onClick = {
                 registerUser(
                     viewModel,
                     User(firstName, lastName, phoneNumber, email, password)
                 )
             },
+            colors = ButtonDefaults.textButtonColors(
+                backgroundColor = MaterialTheme.colors.background,
+                contentColor = MaterialTheme.colors.primaryVariant
+            ),
             modifier = Modifier
-                .padding(top = 80.dp)
-                .fillMaxWidth(),
+                .padding(top = 50.dp, start = 20.dp, end = 20.dp)
+                .fillMaxWidth()
         ) {
-            Text(text = "Sign Up")
+            Text(
+                text = "Sign Up",
+                fontSize = 20.sp,
+                fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
+            )
         }
     }
 
