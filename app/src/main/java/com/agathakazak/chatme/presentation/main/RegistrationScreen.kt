@@ -38,7 +38,9 @@ import com.agathakazak.chatme.presentation.isValidPhoneNumber
 fun RegistrationScreen(context: Context) {
     val viewModel: MainViewModel = viewModel()
     var firstName by rememberSaveable { mutableStateOf("") }
+    var firstNameError by rememberSaveable { mutableStateOf(false) }
     var lastName by rememberSaveable { mutableStateOf("") }
+    var lastNameError by rememberSaveable { mutableStateOf(false) }
     var phoneNumber by rememberSaveable { mutableStateOf("") }
     var phoneError by rememberSaveable { mutableStateOf(false) }
     var email by rememberSaveable { mutableStateOf("") }
@@ -66,30 +68,49 @@ fun RegistrationScreen(context: Context) {
         )
         TextField(
             value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text(text = stringResource(R.string.first_name)) },
+            onValueChange = {
+                firstName = it
+                firstNameError = it.isBlank()
+            },
+            label = {
+                Text(
+                    text = if (!firstNameError) {
+                        stringResource(R.string.first_name)
+                    } else {
+                        stringResource(R.string.first_name_error)
+                    }
+                )
+            },
             singleLine = true,
+            isError = firstNameError,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = MaterialTheme.colors.background,
                 textColor = MaterialTheme.colors.onPrimary
             )
         )
+        ShowError(firstNameError, stringResource(R.string.first_name_error_message))
         TextField(
             value = lastName,
             onValueChange = { lastName = it },
-            label = { Text(text = stringResource(R.string.last_name)) },
+            label = { Text(text = if(!lastNameError) {
+                stringResource(R.string.last_name)
+            } else {
+                stringResource(R.string.last_name_error)
+            }) },
             singleLine = true,
+            isError = lastNameError,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
+                .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = MaterialTheme.colors.background,
                 textColor = MaterialTheme.colors.onPrimary
             )
         )
+        ShowError(lastNameError, stringResource(R.string.last_name_error_message))
         TextField(
             value = phoneNumber,
             onValueChange = {
@@ -237,10 +258,18 @@ fun RegistrationScreen(context: Context) {
         ShowError(repeatedPasswordError, stringResource(R.string.repeated_password_error_message))
         TextButton(
             onClick = {
-                registerUser(
-                    viewModel,
-                    User(firstName, lastName, phoneNumber, email, password)
-                )
+                if (firstName.isBlank()) firstNameError = true
+                if (lastName.isBlank()) lastNameError = true
+                if (phoneNumber.isBlank()) phoneError = true
+                if (email.isBlank()) emailError = true
+                if (password.isBlank()) passwordError = true
+                if (repeatedPassword.isBlank()) repeatedPasswordError = true
+                if (!firstNameError && !lastNameError && !phoneError
+                    && !emailError && !passwordError && !repeatedPasswordError
+                ) {
+                    viewModel.registerUser(User(firstName, lastName, phoneNumber, email, password))
+                }
+
             },
             colors = ButtonDefaults.textButtonColors(
                 backgroundColor = MaterialTheme.colors.background,
@@ -272,8 +301,3 @@ private fun ShowError(isError: Boolean, errorText: String) {
         )
     }
 }
-
-private fun registerUser(viewModel: MainViewModel, user: User) {
-    viewModel.registerUser(user)
-}
-
