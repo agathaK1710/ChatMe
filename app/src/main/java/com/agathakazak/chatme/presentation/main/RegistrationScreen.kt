@@ -68,7 +68,10 @@ fun RegistrationScreen(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                textColor = MaterialTheme.colors.onPrimary
+            )
         )
         TextField(
             value = lastName,
@@ -78,7 +81,10 @@ fun RegistrationScreen(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                textColor = MaterialTheme.colors.onPrimary
+            )
         )
         TextField(
             value = phoneNumber,
@@ -101,7 +107,10 @@ fun RegistrationScreen(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                textColor = MaterialTheme.colors.onPrimary
+            )
         )
         ShowError(
             phoneError,
@@ -128,7 +137,10 @@ fun RegistrationScreen(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                textColor = MaterialTheme.colors.onPrimary
+            )
         )
         ShowError(emailError, stringResource(R.string.email_error_message))
         TextField(
@@ -167,7 +179,10 @@ fun RegistrationScreen(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                textColor = MaterialTheme.colors.onPrimary
+            )
         )
         ShowError(
             passwordError,
@@ -210,7 +225,10 @@ fun RegistrationScreen(context: Context) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
+            colors = TextFieldDefaults.textFieldColors(
+                backgroundColor = MaterialTheme.colors.background,
+                textColor = MaterialTheme.colors.onPrimary
+            )
         )
         ShowError(repeatedPasswordError, stringResource(R.string.repeated_password_error_message))
         TextButton(
