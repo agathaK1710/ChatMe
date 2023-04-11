@@ -51,15 +51,14 @@ fun RegistrationScreen(context: Context) {
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
             painter = painterResource(id = R.drawable.registration),
             contentDescription = stringResource(R.string.reg_icon_content_description),
             modifier = Modifier
                 .width(300.dp)
-                .padding(40.dp),
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant)
+                .padding(40.dp).align(Alignment.CenterHorizontally),
+            colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
         )
         TextField(
             value = firstName,
