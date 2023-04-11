@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -54,7 +55,7 @@ fun RegistrationScreen(context: Context) {
     ) {
         Image(
             painter = painterResource(id = R.drawable.registration),
-            contentDescription = "Registration icon",
+            contentDescription = stringResource(R.string.reg_icon_content_description),
             modifier = Modifier
                 .width(300.dp)
                 .padding(40.dp),
@@ -63,7 +64,7 @@ fun RegistrationScreen(context: Context) {
         TextField(
             value = firstName,
             onValueChange = { firstName = it },
-            label = { Text(text = "First name") },
+            label = { Text(text = stringResource(R.string.first_name)) },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -73,7 +74,7 @@ fun RegistrationScreen(context: Context) {
         TextField(
             value = lastName,
             onValueChange = { lastName = it },
-            label = { Text(text = "Last name") },
+            label = { Text(text = stringResource(R.string.last_name)) },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
@@ -87,7 +88,13 @@ fun RegistrationScreen(context: Context) {
                 phoneError = !isValidPhoneNumber(phoneNumber)
             },
             label = {
-                Text(if (phoneError) "Phone number*" else "Phone number")
+                Text(
+                    if (phoneError) {
+                        stringResource(R.string.phone_number_error)
+                    } else {
+                        stringResource(R.string.phone_number)
+                    }
+                )
             },
             singleLine = true,
             isError = phoneError,
@@ -97,7 +104,10 @@ fun RegistrationScreen(context: Context) {
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        ShowError(phoneError, "Not valid phone number. It must contains '+' and length 10-13 symbols")
+        ShowError(
+            phoneError,
+            stringResource(R.string.phone_error_message)
+        )
         TextField(
             value = email,
             onValueChange = {
@@ -105,7 +115,13 @@ fun RegistrationScreen(context: Context) {
                 emailError = !isValidEmail(email)
             },
             label = {
-                Text(if (emailError) "Email*" else "Email")
+                Text(
+                    if (emailError) {
+                        stringResource(R.string.email_error)
+                    } else {
+                        stringResource(R.string.email)
+                    }
+                )
             },
             singleLine = true,
             isError = emailError,
@@ -115,7 +131,7 @@ fun RegistrationScreen(context: Context) {
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        ShowError(emailError, "Email must be like ivan.ivanov@gmail.com" )
+        ShowError(emailError, stringResource(R.string.email_error_message))
         TextField(
             value = password,
             onValueChange = {
@@ -123,7 +139,13 @@ fun RegistrationScreen(context: Context) {
                 passwordError = !isValidPassword(password)
             },
             label = {
-                Text(if (passwordError) "Enter password*" else "Enter password")
+                Text(
+                    if (passwordError) {
+                        stringResource(R.string.password_error)
+                    } else {
+                        stringResource(R.string.password)
+                    }
+                )
             },
             singleLine = true,
             isError = passwordError,
@@ -135,7 +157,11 @@ fun RegistrationScreen(context: Context) {
                     val visibilityIcon =
                         if (passwordHidden) painterResource(id = R.drawable.visibility)
                         else painterResource(id = R.drawable.visibility_off)
-                    val description = if (passwordHidden) "Show password" else "Hide password"
+                    val description = if (passwordHidden) {
+                        stringResource(R.string.show_password_content_description)
+                    } else {
+                        stringResource(R.string.hide_password_content_description)
+                    }
                     Icon(painter = visibilityIcon, contentDescription = description)
                 }
             },
@@ -144,7 +170,10 @@ fun RegistrationScreen(context: Context) {
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        ShowError(passwordError , "Password length must be at least 8 characters. Password must contain numbers 1-9 and at least one symbol a-z or A-Z." )
+        ShowError(
+            passwordError,
+            stringResource(R.string.password_error_message)
+        )
         TextField(
             value = repeatedPassword,
             onValueChange = {
@@ -152,7 +181,13 @@ fun RegistrationScreen(context: Context) {
                 repeatedPasswordError = repeatedPassword != password
             },
             label = {
-                Text(if (repeatedPasswordError) "Repeat password*" else "Repeat password")
+                Text(
+                    if (repeatedPasswordError) {
+                        stringResource(R.string.repeat_password_error)
+                    } else {
+                        stringResource(R.string.repeat_password)
+                    }
+                )
             },
             singleLine = true,
             isError = repeatedPasswordError,
@@ -165,7 +200,11 @@ fun RegistrationScreen(context: Context) {
                         if (repeatedPasswordHidden) painterResource(id = R.drawable.visibility)
                         else painterResource(id = R.drawable.visibility_off)
                     val description =
-                        if (repeatedPasswordHidden) "Show password" else "Hide password"
+                        if (repeatedPasswordHidden) {
+                            stringResource(R.string.show_password_content_description)
+                        } else {
+                            stringResource(R.string.hide_password_content_description)
+                        }
                     Icon(painter = visibilityIcon, contentDescription = description)
                 }
             },
@@ -174,7 +213,7 @@ fun RegistrationScreen(context: Context) {
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        ShowError(repeatedPasswordError,"The repeated password doesn't match the password." )
+        ShowError(repeatedPasswordError, stringResource(R.string.repeated_password_error_message))
         TextButton(
             onClick = {
                 registerUser(
@@ -191,7 +230,7 @@ fun RegistrationScreen(context: Context) {
                 .fillMaxWidth()
         ) {
             Text(
-                text = "Sign Up",
+                text = stringResource(R.string.sign_up),
                 fontSize = 20.sp,
                 fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
             )
@@ -207,7 +246,7 @@ private fun ShowError(isError: Boolean, errorText: String) {
             text = errorText,
             color = MaterialTheme.colors.error,
             style = MaterialTheme.typography.caption,
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 8.dp),
             textAlign = TextAlign.Start
         )
     }

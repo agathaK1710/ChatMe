@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">ChatMe</string>
+    <string name="reg_icon_content_description">Registration icon</string>
+    <string name="first_name">First name</string>
+    <string name="last_name">Last name</string>
+    <string name="phone_number_error">Phone number*</string>
+    <string name="phone_number">Phone number</string>
+    <string name="phone_error_message">Not valid phone number. It must contains \'+\' and length 10-13 symbols</string>
+    <string name="email_error">Email*</string>
+    <string name="email">Email</string>
+    <string name="email_error_message">Email must be like ivan.ivanov@gmail.com</string>
+    <string name="password_error">Enter password*</string>
+    <string name="password">Enter password</string>
+    <string name="password_error_message">Password length must be at least 8 characters. Password must contain numbers 1-9 and at least one symbol a-z or A-Z.</string>
+    <string name="repeat_password_error">Repeat password*</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="show_password_content_description">Show password</string>
+    <string name="hide_password_content_description">Hide password</string>
+    <string name="repeated_password_error_message">The repeated password doesn\'t match the password.</string>
+    <string name="sign_up">Sign Up</string>
 </resources>
