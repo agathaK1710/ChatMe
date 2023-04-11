@@ -15,23 +15,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.error
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.User
+import com.agathakazak.chatme.presentation.isValidEmail
+import com.agathakazak.chatme.presentation.isValidPassword
+import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 
 @Composable
 fun RegistrationScreen(context: Context) {
-    val viewModel:MainViewModel = viewModel()
+    val viewModel: MainViewModel = viewModel()
     var firstName by rememberSaveable { mutableStateOf("") }
     var lastName by rememberSaveable { mutableStateOf("") }
     var phoneNumber by rememberSaveable { mutableStateOf("") }
@@ -40,9 +42,10 @@ fun RegistrationScreen(context: Context) {
     var emailError by rememberSaveable { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
+    var passwordError by rememberSaveable { mutableStateOf(false) }
     var repeatedPassword by rememberSaveable { mutableStateOf("") }
     var repeatedPasswordHidden by rememberSaveable { mutableStateOf(true) }
-    var passwordError by rememberSaveable { mutableStateOf(false) }
+    var repeatedPasswordError by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -52,7 +55,9 @@ fun RegistrationScreen(context: Context) {
         Image(
             painter = painterResource(id = R.drawable.registration),
             contentDescription = "Registration icon",
-            modifier = Modifier.width(300.dp).padding(40.dp),
+            modifier = Modifier
+                .width(300.dp)
+                .padding(40.dp),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant)
         )
         TextField(
@@ -62,10 +67,9 @@ fun RegistrationScreen(context: Context) {
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
+                .padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        Spacer(modifier = Modifier.padding(8.dp))
         TextField(
             value = lastName,
             onValueChange = { lastName = it },
@@ -73,59 +77,56 @@ fun RegistrationScreen(context: Context) {
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
+                .padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        Spacer(modifier = Modifier.padding(8.dp))
         TextField(
             value = phoneNumber,
             onValueChange = {
                 phoneNumber = it
-                phoneError = false
+                phoneError = !isValidPhoneNumber(phoneNumber)
             },
             label = {
                 Text(if (phoneError) "Phone number*" else "Phone number")
             },
             singleLine = true,
             isError = phoneError,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
             modifier = Modifier
-                .semantics {
-                    if (phoneError) error("Phone number format is invalid")
-                }
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        Spacer(modifier = Modifier.padding(8.dp))
+        ShowError(phoneError, "Not valid phone number. It must contains '+' and length 10-13 symbols")
         TextField(
             value = email,
             onValueChange = {
                 email = it
-                emailError = false
+                emailError = !isValidEmail(email)
             },
             label = {
                 Text(if (emailError) "Email*" else "Email")
             },
             singleLine = true,
             isError = emailError,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier
-                .semantics {
-                    if (emailError) error("Email format is invalid")
-                }
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-        Spacer(modifier = Modifier.padding(8.dp))
+        ShowError(emailError, "Email must be like ivan.ivanov@gmail.com" )
         TextField(
             value = password,
             onValueChange = {
                 password = it
+                passwordError = !isValidPassword(password)
             },
             label = {
-                Text("Enter password")
+                Text(if (passwordError) "Enter password*" else "Enter password")
             },
             singleLine = true,
+            isError = passwordError,
             visualTransformation = if (passwordHidden) PasswordVisualTransformation()
             else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -139,26 +140,22 @@ fun RegistrationScreen(context: Context) {
                 }
             },
             modifier = Modifier
-                .semantics {
-                    if (emailError) error("Email format is invalid")
-                }
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
-
-        Spacer(modifier = Modifier.padding(8.dp))
+        ShowError(passwordError , "Password length must be at least 8 characters. Password must contain numbers 1-9 and at least one symbol a-z or A-Z." )
         TextField(
             value = repeatedPassword,
             onValueChange = {
                 repeatedPassword = it
-                passwordError = repeatedPassword != password
+                repeatedPasswordError = repeatedPassword != password
             },
             label = {
-                Text(if (passwordError) "Repeat password*" else "Repeat password")
+                Text(if (repeatedPasswordError) "Repeat password*" else "Repeat password")
             },
             singleLine = true,
-            isError = passwordError,
+            isError = repeatedPasswordError,
             visualTransformation = if (repeatedPasswordHidden) PasswordVisualTransformation()
             else VisualTransformation.None,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -173,13 +170,11 @@ fun RegistrationScreen(context: Context) {
                 }
             },
             modifier = Modifier
-                .semantics {
-                    if (emailError) error("Email format is invalid")
-                }
                 .fillMaxWidth()
                 .padding(start = 20.dp, end = 20.dp),
             colors = TextFieldDefaults.textFieldColors(backgroundColor = MaterialTheme.colors.background)
         )
+        ShowError(repeatedPasswordError,"The repeated password doesn't match the password." )
         TextButton(
             onClick = {
                 registerUser(
@@ -203,6 +198,19 @@ fun RegistrationScreen(context: Context) {
         }
     }
 
+}
+
+@Composable
+private fun ShowError(isError: Boolean, errorText: String) {
+    if (isError) {
+        Text(
+            text = errorText,
+            color = MaterialTheme.colors.error,
+            style = MaterialTheme.typography.caption,
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, bottom = 16.dp),
+            textAlign = TextAlign.Start
+        )
+    }
 }
 
 private fun registerUser(viewModel: MainViewModel, user: User) {
