@@ -4,7 +4,9 @@ import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -50,6 +52,7 @@ fun RegistrationScreen(context: Context) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState(), reverseScrolling = true)
             .background(MaterialTheme.colors.background),
     ) {
         Image(
@@ -57,7 +60,8 @@ fun RegistrationScreen(context: Context) {
             contentDescription = stringResource(R.string.reg_icon_content_description),
             modifier = Modifier
                 .width(300.dp)
-                .padding(40.dp).align(Alignment.CenterHorizontally),
+                .padding(40.dp)
+                .align(Alignment.CenterHorizontally),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
         )
         TextField(
