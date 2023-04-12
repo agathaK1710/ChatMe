@@ -54,235 +54,283 @@ fun RegistrationScreen() {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState(), reverseScrolling = true)
-            .background(MaterialTheme.colors.background),
+            .background(MaterialTheme.colors.background)
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.registration),
-            contentDescription = stringResource(R.string.reg_icon_content_description),
+        Column(
             modifier = Modifier
-                .width(500.dp)
-                .padding(60.dp)
-                .align(Alignment.CenterHorizontally),
-            colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
-        )
-        TextField(
-            value = firstName,
-            onValueChange = {
-                firstName = it
-                firstNameError = it.isBlank()
-            },
-            label = {
-                Text(
-                    text = if (!firstNameError) {
-                        stringResource(R.string.first_name)
-                    } else {
-                        stringResource(R.string.first_name_error)
-                    }
-                )
-            },
-            singleLine = true,
-            isError = firstNameError,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onPrimary
+                .fillMaxSize()
+                .weight(1f)
+                .verticalScroll(rememberScrollState(), reverseScrolling = true)
+                .background(MaterialTheme.colors.background),
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.registration),
+                contentDescription = stringResource(R.string.reg_icon_content_description),
+                modifier = Modifier
+                    .width(500.dp)
+                    .padding(60.dp)
+                    .align(Alignment.CenterHorizontally),
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
             )
-        )
-        ShowError(firstNameError, stringResource(R.string.first_name_error_message))
-        TextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text(text = if(!lastNameError) {
-                stringResource(R.string.last_name)
-            } else {
-                stringResource(R.string.last_name_error)
-            }) },
-            singleLine = true,
-            isError = lastNameError,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onPrimary
-            )
-        )
-        ShowError(lastNameError, stringResource(R.string.last_name_error_message))
-        TextField(
-            value = phoneNumber,
-            onValueChange = {
-                phoneNumber = it
-                phoneError = !isValidPhoneNumber(phoneNumber)
-            },
-            label = {
-                Text(
-                    if (phoneError) {
-                        stringResource(R.string.phone_number_error)
-                    } else {
-                        stringResource(R.string.phone_number)
-                    }
+            TextField(
+                value = firstName,
+                onValueChange = {
+                    firstName = it
+                    firstNameError = it.isBlank()
+                },
+                label = {
+                    Text(
+                        text = if (!firstNameError) {
+                            stringResource(R.string.first_name)
+                        } else {
+                            stringResource(R.string.first_name_error)
+                        }
+                    )
+                },
+                singleLine = true,
+                isError = firstNameError,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    textColor = MaterialTheme.colors.onPrimary
                 )
-            },
-            singleLine = true,
-            isError = phoneError,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onPrimary
             )
-        )
-        ShowError(
-            phoneError,
-            stringResource(R.string.phone_error_message)
-        )
-        TextField(
-            value = email,
-            onValueChange = {
-                email = it
-                emailError = !isValidEmail(email)
-            },
-            label = {
-                Text(
-                    if (emailError) {
-                        stringResource(R.string.email_error)
-                    } else {
-                        stringResource(R.string.email)
-                    }
+            ShowError(firstNameError, stringResource(R.string.first_name_error_message))
+            TextField(
+                value = lastName,
+                onValueChange = { lastName = it },
+                label = {
+                    Text(
+                        text = if (!lastNameError) {
+                            stringResource(R.string.last_name)
+                        } else {
+                            stringResource(R.string.last_name_error)
+                        }
+                    )
+                },
+                singleLine = true,
+                isError = lastNameError,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    textColor = MaterialTheme.colors.onPrimary
                 )
-            },
-            singleLine = true,
-            isError = emailError,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onPrimary
             )
-        )
-        ShowError(emailError, stringResource(R.string.email_error_message))
-        TextField(
-            value = password,
-            onValueChange = {
-                password = it
-                passwordError = !isValidPassword(password)
-            },
-            label = {
-                Text(
-                    if (passwordError) {
-                        stringResource(R.string.password_error)
-                    } else {
-                        stringResource(R.string.password)
-                    }
+            ShowError(lastNameError, stringResource(R.string.last_name_error_message))
+            TextField(
+                value = phoneNumber,
+                onValueChange = {
+                    phoneNumber = it
+                    phoneError = !isValidPhoneNumber(phoneNumber)
+                },
+                label = {
+                    Text(
+                        if (phoneError) {
+                            stringResource(R.string.phone_number_error)
+                        } else {
+                            stringResource(R.string.phone_number)
+                        }
+                    )
+                },
+                singleLine = true,
+                isError = phoneError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    textColor = MaterialTheme.colors.onPrimary
                 )
-            },
-            singleLine = true,
-            isError = passwordError,
-            visualTransformation = if (passwordHidden) PasswordVisualTransformation()
-            else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            trailingIcon = {
-                IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                    val visibilityIcon =
-                        if (passwordHidden) painterResource(id = R.drawable.visibility)
-                        else painterResource(id = R.drawable.visibility_off)
-                    val description = if (passwordHidden) {
-                        stringResource(R.string.show_password_content_description)
-                    } else {
-                        stringResource(R.string.hide_password_content_description)
-                    }
-                    Icon(painter = visibilityIcon, contentDescription = description)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onPrimary
             )
-        )
-        ShowError(
-            passwordError,
-            stringResource(R.string.password_error_message)
-        )
-        TextField(
-            value = repeatedPassword,
-            onValueChange = {
-                repeatedPassword = it
-                repeatedPasswordError = repeatedPassword != password
-            },
-            label = {
-                Text(
-                    if (repeatedPasswordError) {
-                        stringResource(R.string.repeat_password_error)
-                    } else {
-                        stringResource(R.string.repeat_password)
-                    }
+            ShowError(
+                phoneError,
+                stringResource(R.string.phone_error_message)
+            )
+            TextField(
+                value = email,
+                onValueChange = {
+                    email = it
+                    emailError = !isValidEmail(email)
+                },
+                label = {
+                    Text(
+                        if (emailError) {
+                            stringResource(R.string.email_error)
+                        } else {
+                            stringResource(R.string.email)
+                        }
+                    )
+                },
+                singleLine = true,
+                isError = emailError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    textColor = MaterialTheme.colors.onPrimary
                 )
-            },
-            singleLine = true,
-            isError = repeatedPasswordError,
-            visualTransformation = if (repeatedPasswordHidden) PasswordVisualTransformation()
-            else VisualTransformation.None,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            trailingIcon = {
-                IconButton(onClick = { repeatedPasswordHidden = !repeatedPasswordHidden }) {
-                    val visibilityIcon =
-                        if (repeatedPasswordHidden) painterResource(id = R.drawable.visibility)
-                        else painterResource(id = R.drawable.visibility_off)
-                    val description =
-                        if (repeatedPasswordHidden) {
+            )
+            ShowError(emailError, stringResource(R.string.email_error_message))
+            TextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                    passwordError = !isValidPassword(password)
+                },
+                label = {
+                    Text(
+                        if (passwordError) {
+                            stringResource(R.string.password_error)
+                        } else {
+                            stringResource(R.string.password)
+                        }
+                    )
+                },
+                singleLine = true,
+                isError = passwordError,
+                visualTransformation = if (passwordHidden) PasswordVisualTransformation()
+                else VisualTransformation.None,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    IconButton(onClick = { passwordHidden = !passwordHidden }) {
+                        val visibilityIcon =
+                            if (passwordHidden) painterResource(id = R.drawable.visibility)
+                            else painterResource(id = R.drawable.visibility_off)
+                        val description = if (passwordHidden) {
                             stringResource(R.string.show_password_content_description)
                         } else {
                             stringResource(R.string.hide_password_content_description)
                         }
-                    Icon(painter = visibilityIcon, contentDescription = description)
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 20.dp, end = 20.dp),
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = MaterialTheme.colors.background,
-                textColor = MaterialTheme.colors.onPrimary
+                        Icon(painter = visibilityIcon, contentDescription = description)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    textColor = MaterialTheme.colors.onPrimary
+                )
             )
-        )
-        ShowError(repeatedPasswordError, stringResource(R.string.repeated_password_error_message))
-        TextButton(
-            onClick = {
-                if (firstName.isBlank()) firstNameError = true
-                if (lastName.isBlank()) lastNameError = true
-                if (phoneNumber.isBlank()) phoneError = true
-                if (email.isBlank()) emailError = true
-                if (password.isBlank()) passwordError = true
-                if (repeatedPassword.isBlank()) repeatedPasswordError = true
-                if (!firstNameError && !lastNameError && !phoneError
-                    && !emailError && !passwordError && !repeatedPasswordError
-                ) {
-                    viewModel.registerUser(User(firstName, lastName, phoneNumber, email, password))
-                }
+            ShowError(
+                passwordError,
+                stringResource(R.string.password_error_message)
+            )
+            TextField(
+                value = repeatedPassword,
+                onValueChange = {
+                    repeatedPassword = it
+                    repeatedPasswordError = repeatedPassword != password
+                },
+                label = {
+                    Text(
+                        if (repeatedPasswordError) {
+                            stringResource(R.string.repeat_password_error)
+                        } else {
+                            stringResource(R.string.repeat_password)
+                        }
+                    )
+                },
+                singleLine = true,
+                isError = repeatedPasswordError,
+                visualTransformation = if (repeatedPasswordHidden) PasswordVisualTransformation()
+                else VisualTransformation.None,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                trailingIcon = {
+                    IconButton(onClick = { repeatedPasswordHidden = !repeatedPasswordHidden }) {
+                        val visibilityIcon =
+                            if (repeatedPasswordHidden) painterResource(id = R.drawable.visibility)
+                            else painterResource(id = R.drawable.visibility_off)
+                        val description =
+                            if (repeatedPasswordHidden) {
+                                stringResource(R.string.show_password_content_description)
+                            } else {
+                                stringResource(R.string.hide_password_content_description)
+                            }
+                        Icon(painter = visibilityIcon, contentDescription = description)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp, end = 20.dp),
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    textColor = MaterialTheme.colors.onPrimary
+                )
+            )
+            ShowError(
+                repeatedPasswordError,
+                stringResource(R.string.repeated_password_error_message)
+            )
+            TextButton(
+                onClick = {
+                    if (firstName.isBlank()) firstNameError = true
+                    if (lastName.isBlank()) lastNameError = true
+                    if (phoneNumber.isBlank()) phoneError = true
+                    if (email.isBlank()) emailError = true
+                    if (password.isBlank()) passwordError = true
+                    if (repeatedPassword.isBlank()) repeatedPasswordError = true
+                    if (!firstNameError && !lastNameError && !phoneError
+                        && !emailError && !passwordError && !repeatedPasswordError
+                    ) {
+                        viewModel.registerUser(
+                            User(
+                                firstName,
+                                lastName,
+                                phoneNumber,
+                                email,
+                                password
+                            )
+                        )
+                    }
 
-            },
-            colors = ButtonDefaults.textButtonColors(
-                backgroundColor = MaterialTheme.colors.background,
-                contentColor = MaterialTheme.colors.primaryVariant
-            ),
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = MaterialTheme.colors.primaryVariant
+                ),
+                modifier = Modifier
+                    .padding(top = 50.dp, start = 20.dp, end = 20.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_up),
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
+                )
+            }
+        }
+        Row(
             modifier = Modifier
-                .padding(top = 50.dp, start = 20.dp, end = 20.dp)
-                .fillMaxWidth()
+                .wrapContentWidth()
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 10.dp)
         ) {
             Text(
-                text = stringResource(R.string.sign_up),
-                fontSize = 20.sp,
-                fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
+                stringResource(R.string.no_account_question),
+                color = MaterialTheme.colors.onPrimary,
+                modifier = Modifier.padding(top = 12.dp),
+                textAlign = TextAlign.Center
             )
+            TextButton(
+                onClick = { },
+                colors = ButtonDefaults.textButtonColors(
+                    backgroundColor = MaterialTheme.colors.background,
+                    contentColor = MaterialTheme.colors.primaryVariant
+                ),
+            ) {
+                Text(
+                    text = stringResource(R.string.sign_in),
+                    fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
+                )
+            }
         }
     }
 

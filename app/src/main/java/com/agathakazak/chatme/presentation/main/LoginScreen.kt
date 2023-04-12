@@ -170,7 +170,7 @@ fun LoginScreen() {
             modifier = Modifier
                 .wrapContentWidth()
                 .align(Alignment.CenterHorizontally)
-                .padding(bottom = 20.dp)
+                .padding(bottom = 10.dp)
         ) {
             Text(
                 stringResource(R.string.no_account_question),
