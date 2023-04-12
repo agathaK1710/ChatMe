@@ -22,4 +22,10 @@
     <string name="first_name_error_message">First name must not be blank.</string>
     <string name="first_name_error">First name*</string>
     <string name="last_name_error">Last name*</string>
+    <string name="sign_in">Sign In</string>
+    <string name="login_icon">Login icon</string>
+    <string name="number_email">Enter phone number or email</string>
+    <string name="number_email_error">Enter phone number or email*</string>
+    <string name="number_email_error_message">Not valid phone number or email.</string>
+    <string name="no_account_question">Don\'t have an account?</string>
 </resources>

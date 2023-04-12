@@ -1,8 +1,9 @@
-package com.agathakazak.chatme
+package com.agathakazak.chatme.presentation
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import com.agathakazak.chatme.presentation.main.LoginScreen
 import com.agathakazak.chatme.presentation.main.RegistrationScreen
 import com.agathakazak.chatme.ui.theme.ChatMeTheme
 
@@ -11,7 +12,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             ChatMeTheme {
-               RegistrationScreen(this)
+                LoginScreen()
             }
         }
     }

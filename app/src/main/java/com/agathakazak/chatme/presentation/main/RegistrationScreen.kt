@@ -1,6 +1,5 @@
 package com.agathakazak.chatme.presentation.main
 
-import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -35,7 +34,7 @@ import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 
 @Composable
-fun RegistrationScreen(context: Context) {
+fun RegistrationScreen() {
     val viewModel: MainViewModel = viewModel()
     var firstName by rememberSaveable { mutableStateOf("") }
     var firstNameError by rememberSaveable { mutableStateOf(false) }
@@ -61,8 +60,8 @@ fun RegistrationScreen(context: Context) {
             painter = painterResource(id = R.drawable.registration),
             contentDescription = stringResource(R.string.reg_icon_content_description),
             modifier = Modifier
-                .width(300.dp)
-                .padding(40.dp)
+                .width(500.dp)
+                .padding(60.dp)
                 .align(Alignment.CenterHorizontally),
             colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
         )
