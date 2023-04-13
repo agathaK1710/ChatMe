@@ -25,17 +25,17 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
-import com.agathakazak.chatme.domain.User
 import com.agathakazak.chatme.presentation.isValidEmail
 import com.agathakazak.chatme.presentation.isValidPassword
 import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 
 @Composable
-fun RegistrationScreen() {
-    val viewModel: MainViewModel = viewModel()
+fun RegistrationScreen(
+    onClickSignIn: () -> Unit,
+    onClickSignUp: () -> Unit
+) {
     var firstName by rememberSaveable { mutableStateOf("") }
     var firstNameError by rememberSaveable { mutableStateOf(false) }
     var lastName by rememberSaveable { mutableStateOf("") }
@@ -280,17 +280,8 @@ fun RegistrationScreen() {
                     if (!firstNameError && !lastNameError && !phoneError
                         && !emailError && !passwordError && !repeatedPasswordError
                     ) {
-                        viewModel.registerUser(
-                            User(
-                                firstName,
-                                lastName,
-                                phoneNumber,
-                                email,
-                                password
-                            )
-                        )
+                        onClickSignUp()
                     }
-
                 },
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.background,
@@ -314,13 +305,15 @@ fun RegistrationScreen() {
                 .padding(bottom = 10.dp)
         ) {
             Text(
-                stringResource(R.string.no_account_question),
+                stringResource(R.string.account_question),
                 color = MaterialTheme.colors.onPrimary,
                 modifier = Modifier.padding(top = 12.dp),
                 textAlign = TextAlign.Center
             )
             TextButton(
-                onClick = { },
+                onClick = {
+                    onClickSignIn()
+                },
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.background,
                     contentColor = MaterialTheme.colors.primaryVariant

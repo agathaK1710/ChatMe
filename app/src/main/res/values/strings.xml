@@ -5,13 +5,13 @@
     <string name="last_name">Last name</string>
     <string name="phone_number_error">Phone number*</string>
     <string name="phone_number">Phone number</string>
-    <string name="phone_error_message">Not valid phone number. It must contains \'+\' and length 10-13 symbols</string>
+    <string name="phone_error_message">Not valid phone number. It must contains \'+\' and length 10–13 symbols</string>
     <string name="email_error">Email*</string>
     <string name="email">Email</string>
     <string name="email_error_message">Email must be like ivan.ivanov@gmail.com</string>
     <string name="password_error">Enter password*</string>
     <string name="password">Enter password</string>
-    <string name="password_error_message">Password length must be at least 8 characters. Password must contain numbers 1-9 and at least one symbol a-z or A-Z.</string>
+    <string name="password_error_message">Password length must be at least 8 characters. Password must contain numbers 1–9 and at least one symbol a-z or A-Z.</string>
     <string name="repeat_password_error">Repeat password*</string>
     <string name="repeat_password">Repeat password</string>
     <string name="show_password_content_description">Show password</string>
@@ -28,4 +28,5 @@
     <string name="number_email_error">Enter phone number or email*</string>
     <string name="number_email_error_message">Not valid phone number or email.</string>
     <string name="no_account_question">Don\'t have an account?</string>
+    <string name="account_question">Already have an account?</string>
 </resources>

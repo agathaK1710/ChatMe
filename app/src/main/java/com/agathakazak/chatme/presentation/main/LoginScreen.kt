@@ -3,7 +3,6 @@ package com.agathakazak.chatme.presentation.main
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -32,7 +31,10 @@ import com.agathakazak.chatme.presentation.isValidPassword
 import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(
+    onClickSignIn: () -> Unit,
+    onClickSignUp: () -> Unit
+) {
     var numberOrEmail by rememberSaveable { mutableStateOf("") }
     var numberOrEmailError by rememberSaveable { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf("") }
@@ -148,7 +150,7 @@ fun LoginScreen() {
                     if (numberOrEmail.isBlank()) numberOrEmailError = true
                     if (password.isBlank()) passwordError = true
                     if (!numberOrEmailError && !passwordError) {
-
+                        onClickSignIn()
                     }
                 },
                 colors = ButtonDefaults.textButtonColors(
@@ -179,7 +181,9 @@ fun LoginScreen() {
                 textAlign = TextAlign.Center
             )
             TextButton(
-                onClick = { },
+                onClick = {
+                    onClickSignUp()
+                },
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.background,
                     contentColor = MaterialTheme.colors.primaryVariant
