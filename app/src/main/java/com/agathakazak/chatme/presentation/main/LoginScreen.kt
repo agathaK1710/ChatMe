@@ -25,16 +25,18 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
+import com.agathakazak.chatme.domain.UserLogin
 import com.agathakazak.chatme.presentation.isValidEmail
 import com.agathakazak.chatme.presentation.isValidPassword
 import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 @Composable
 fun LoginScreen(
-    onClickSignIn: () -> Unit,
     onClickSignUp: () -> Unit
 ) {
+    val viewModel: MainViewModel = viewModel()
     var numberOrEmail by rememberSaveable { mutableStateOf("") }
     var numberOrEmailError by rememberSaveable { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf("") }
@@ -150,7 +152,7 @@ fun LoginScreen(
                     if (numberOrEmail.isBlank()) numberOrEmailError = true
                     if (password.isBlank()) passwordError = true
                     if (!numberOrEmailError && !passwordError) {
-                        onClickSignIn()
+                       viewModel.loginUser(UserLogin(numberOrEmail, password))
                     }
                 },
                 colors = ButtonDefaults.textButtonColors(

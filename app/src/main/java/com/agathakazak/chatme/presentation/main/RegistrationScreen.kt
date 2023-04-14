@@ -25,7 +25,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
+import com.agathakazak.chatme.domain.User
 import com.agathakazak.chatme.presentation.isValidEmail
 import com.agathakazak.chatme.presentation.isValidPassword
 import com.agathakazak.chatme.presentation.isValidPhoneNumber
@@ -33,9 +35,9 @@ import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 @Composable
 fun RegistrationScreen(
-    onClickSignIn: () -> Unit,
-    onClickSignUp: () -> Unit
+    onClickSignIn: () -> Unit
 ) {
+    val viewModel: MainViewModel = viewModel()
     var firstName by rememberSaveable { mutableStateOf("") }
     var firstNameError by rememberSaveable { mutableStateOf(false) }
     var lastName by rememberSaveable { mutableStateOf("") }
@@ -280,7 +282,15 @@ fun RegistrationScreen(
                     if (!firstNameError && !lastNameError && !phoneError
                         && !emailError && !passwordError && !repeatedPasswordError
                     ) {
-                        onClickSignUp()
+                        viewModel.registerUser(
+                            User(
+                                firstName,
+                                lastName,
+                                phoneNumber,
+                                email,
+                                password
+                            )
+                        )
                     }
                 },
                 colors = ButtonDefaults.textButtonColors(
