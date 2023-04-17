@@ -14,12 +14,13 @@ class UserRepository {
         )
     }
 
-    suspend fun loginUser(userLogin: UserLogin): UserResponse<User> {
-        val responseDto = ApiFactory.apiService.loginUser(
-            mapper.mapUserLoginModelToDto(
-                userLogin
+    suspend fun loginUser(userLogin: UserLogin): UserResponse<String> {
+        return mapper.mapUserResponseDtoToModel(
+            ApiFactory.apiService.loginUser(
+                mapper.mapUserLoginModelToDto(
+                    userLogin
+                )
             )
         )
-         return mapper.mapUserResponseDtoWithDataDtoToModel(responseDto)
     }
 }

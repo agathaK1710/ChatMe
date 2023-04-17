@@ -1,5 +1,7 @@
 package com.agathakazak.chatme.presentation.main
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,14 +9,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.Font
@@ -34,168 +35,205 @@ import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 @Composable
 fun LoginScreen(
-    onClickSignUp: () -> Unit
+    onClickSignUp: () -> Unit,
+    navigateToChats: () -> Unit
 ) {
     val viewModel: MainViewModel = viewModel()
+    val loginState = viewModel.loginState.observeAsState(LoginState.Initial)
+    val context = LocalContext.current
     var numberOrEmail by rememberSaveable { mutableStateOf("") }
     var numberOrEmailError by rememberSaveable { mutableStateOf(false) }
     var password by rememberSaveable { mutableStateOf("") }
     var passwordHidden by rememberSaveable { mutableStateOf(true) }
     var passwordError by rememberSaveable { mutableStateOf(false) }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState(), reverseScrolling = true)
-            .background(MaterialTheme.colors.background)
-    ) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(1f)
+                .verticalScroll(rememberScrollState(), reverseScrolling = true)
+                .background(MaterialTheme.colors.background)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.login),
-                contentDescription = stringResource(R.string.login_icon),
+            Column(
                 modifier = Modifier
-                    .width(500.dp)
-                    .padding(60.dp)
-                    .align(Alignment.CenterHorizontally),
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
-            )
-
-            TextField(
-                value = numberOrEmail,
-                onValueChange = {
-                    numberOrEmail = it
-                    numberOrEmailError =
-                        !isValidEmail(numberOrEmail) && !isValidPhoneNumber(numberOrEmail)
-                },
-                label = {
-                    Text(
-                        if (numberOrEmailError) {
-                            stringResource(R.string.number_email_error)
-                        } else {
-                            stringResource(R.string.number_email)
-                        }
-                    )
-                },
-                singleLine = true,
-                isError = numberOrEmailError,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp, top = 20.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = MaterialTheme.colors.background,
-                    textColor = MaterialTheme.colors.onPrimary
+                    .fillMaxSize()
+                    .weight(1f)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.login),
+                    contentDescription = stringResource(R.string.login_icon),
+                    modifier = Modifier
+                        .width(500.dp)
+                        .padding(60.dp)
+                        .align(Alignment.CenterHorizontally),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colors.primaryVariant),
                 )
-            )
-            if (numberOrEmail.matches(Regex("\\+[1-9]*"))) {
-                if (!isValidPhoneNumber(numberOrEmail)) {
-                    ShowError(numberOrEmailError, stringResource(R.string.phone_error_message))
+
+                TextField(
+                    value = numberOrEmail,
+                    onValueChange = {
+                        numberOrEmail = it
+                        numberOrEmailError =
+                            !isValidEmail(numberOrEmail) && !isValidPhoneNumber(numberOrEmail)
+                    },
+                    label = {
+                        Text(
+                            if (numberOrEmailError) {
+                                stringResource(R.string.number_email_error)
+                            } else {
+                                stringResource(R.string.number_email)
+                            }
+                        )
+                    },
+                    singleLine = true,
+                    isError = numberOrEmailError,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = MaterialTheme.colors.background,
+                        textColor = MaterialTheme.colors.onPrimary
+                    )
+                )
+                SetErrors(numberOrEmail, numberOrEmailError)
+
+                TextField(
+                    value = password,
+                    onValueChange = {
+                        password = it
+                        passwordError = !isValidPassword(password)
+                    },
+                    label = {
+                        Text(
+                            if (passwordError) {
+                                stringResource(R.string.password_error)
+                            } else {
+                                stringResource(R.string.password)
+                            }
+                        )
+                    },
+                    singleLine = true,
+                    isError = passwordError,
+                    visualTransformation = if (passwordHidden) PasswordVisualTransformation()
+                    else VisualTransformation.None,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordHidden = !passwordHidden }) {
+                            val visibilityIcon =
+                                if (passwordHidden) painterResource(id = R.drawable.visibility)
+                                else painterResource(id = R.drawable.visibility_off)
+                            val description = if (passwordHidden) {
+                                stringResource(R.string.show_password_content_description)
+                            } else {
+                                stringResource(R.string.hide_password_content_description)
+                            }
+                            Icon(painter = visibilityIcon, contentDescription = description)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 20.dp),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = MaterialTheme.colors.background,
+                        textColor = MaterialTheme.colors.onPrimary
+                    )
+                )
+                ShowError(
+                    passwordError,
+                    stringResource(R.string.password_error_message)
+                )
+
+                TextButton(
+                    onClick = {
+                        if (numberOrEmail.isBlank()) numberOrEmailError = true
+                        if (password.isBlank()) passwordError = true
+                        if (!numberOrEmailError && !passwordError) {
+                            viewModel.loginUser(UserLogin(numberOrEmail, password))
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        backgroundColor = MaterialTheme.colors.background,
+                        contentColor = MaterialTheme.colors.primaryVariant
+                    ),
+                    modifier = Modifier
+                        .padding(top = 110.dp, start = 20.dp, end = 20.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.sign_in),
+                        fontSize = 20.sp,
+                        fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
+                    )
                 }
-            } else if (numberOrEmail.isNotBlank()) {
-                if (!isValidEmail(numberOrEmail)) {
-                    ShowError(numberOrEmailError, stringResource(R.string.email_error_message))
-                }
-            } else if (!isValidPhoneNumber(numberOrEmail) || !isValidPhoneNumber(numberOrEmail)) {
-                ShowError(numberOrEmailError, stringResource(R.string.number_email_error_message))
             }
-
-            TextField(
-                value = password,
-                onValueChange = {
-                    password = it
-                    passwordError = !isValidPassword(password)
-                },
-                label = {
-                    Text(
-                        if (passwordError) {
-                            stringResource(R.string.password_error)
-                        } else {
-                            stringResource(R.string.password)
-                        }
-                    )
-                },
-                singleLine = true,
-                isError = passwordError,
-                visualTransformation = if (passwordHidden) PasswordVisualTransformation()
-                else VisualTransformation.None,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordHidden = !passwordHidden }) {
-                        val visibilityIcon =
-                            if (passwordHidden) painterResource(id = R.drawable.visibility)
-                            else painterResource(id = R.drawable.visibility_off)
-                        val description = if (passwordHidden) {
-                            stringResource(R.string.show_password_content_description)
-                        } else {
-                            stringResource(R.string.hide_password_content_description)
-                        }
-                        Icon(painter = visibilityIcon, contentDescription = description)
-                    }
-                },
+            Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 20.dp, end = 20.dp),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = MaterialTheme.colors.background,
-                    textColor = MaterialTheme.colors.onPrimary
-                )
-            )
-            ShowError(
-                passwordError,
-                stringResource(R.string.password_error_message)
-            )
-
-            TextButton(
-                onClick = {
-                    if (numberOrEmail.isBlank()) numberOrEmailError = true
-                    if (password.isBlank()) passwordError = true
-                    if (!numberOrEmailError && !passwordError) {
-                       viewModel.loginUser(UserLogin(numberOrEmail, password))
-                    }
-                },
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.background,
-                    contentColor = MaterialTheme.colors.primaryVariant
-                ),
-                modifier = Modifier
-                    .padding(top = 50.dp, start = 20.dp, end = 20.dp)
-                    .fillMaxWidth()
+                    .wrapContentWidth()
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 10.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.sign_in),
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
+                    stringResource(R.string.no_account_question),
+                    color = MaterialTheme.colors.onPrimary,
+                    modifier = Modifier.padding(top = 12.dp),
+                    textAlign = TextAlign.Center
                 )
+                TextButton(
+                    onClick = {
+
+                        onClickSignUp()
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        backgroundColor = MaterialTheme.colors.background,
+                        contentColor = MaterialTheme.colors.primaryVariant
+                    ),
+                ) {
+                    Text(
+                        text = stringResource(R.string.sign_up),
+                        fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
+                    )
+                }
             }
         }
-        Row(
-            modifier = Modifier
-                .wrapContentWidth()
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 10.dp)
-        ) {
-            Text(
-                stringResource(R.string.no_account_question),
-                color = MaterialTheme.colors.onPrimary,
-                modifier = Modifier.padding(top = 12.dp),
-                textAlign = TextAlign.Center
-            )
-            TextButton(
-                onClick = {
-                    onClickSignUp()
-                },
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.background,
-                    contentColor = MaterialTheme.colors.primaryVariant
-                ),
-            ) {
-                Text(
-                    text = stringResource(R.string.sign_up),
-                    fontFamily = FontFamily(listOf(Font(R.font.azoft_sans)))
-                )
-            }
+        CheckLoginState(loginState, context, navigateToChats)
+    }
+}
+
+@Composable
+private fun SetErrors(numberOrEmail: String, numberOrEmailError: Boolean) {
+    if (numberOrEmail.matches(Regex("\\+[1-9]*"))) {
+        if (!isValidPhoneNumber(numberOrEmail)) {
+            ShowError(numberOrEmailError, stringResource(R.string.phone_error_message))
+        }
+    } else if (numberOrEmail.isNotBlank()) {
+        if (!isValidEmail(numberOrEmail)) {
+            ShowError(numberOrEmailError, stringResource(R.string.email_error_message))
+        }
+    } else if (!isValidPhoneNumber(numberOrEmail) || !isValidPhoneNumber(numberOrEmail)) {
+        ShowError(
+            numberOrEmailError,
+            stringResource(R.string.number_email_error_message)
+        )
+    }
+}
+
+@Composable
+private fun CheckLoginState(
+    loginState: State<LoginState>,
+    context: Context,
+    navigateToChats: () -> Unit
+) {
+    when (loginState.value) {
+        is LoginState.IsLogged -> {
+
+        }
+        is LoginState.IsLoggingError -> {
+            Toast.makeText(context,  loginState.value.response?.data, Toast.LENGTH_SHORT).show()
+        }
+        is LoginState.Loading -> {
+            CircularProgressIndicator(color = MaterialTheme.colors.secondary)
+        }
+        else -> {
+            navigateToChats()
         }
     }
 }

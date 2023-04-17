@@ -15,6 +15,6 @@ interface ApiService {
     @POST("login")
     suspend fun loginUser(
         @Body userLogin: UserLoginDto
-    ): UserResponseDto<UserDto>
+    ): UserResponseDto<String>
 
 }
