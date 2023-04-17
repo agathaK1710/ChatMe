@@ -1,4 +1,4 @@
-package com.agathakazak.chatme.presentation.main
+package com.agathakazak.chatme.presentation.login
 
 import android.content.Context
 import android.widget.Toast
@@ -38,7 +38,7 @@ fun LoginScreen(
     onClickSignUp: () -> Unit,
     navigateToChats: () -> Unit
 ) {
-    val viewModel: MainViewModel = viewModel()
+    val viewModel: LoginViewModel = viewModel()
     val loginState = viewModel.loginState.observeAsState(LoginState.Initial)
     val context = LocalContext.current
     var numberOrEmail by rememberSaveable { mutableStateOf("") }

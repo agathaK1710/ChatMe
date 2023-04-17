@@ -1,4 +1,4 @@
-package com.agathakazak.chatme.presentation.main
+package com.agathakazak.chatme.presentation.login
 
 import com.agathakazak.chatme.domain.UserResponse
 

@@ -9,10 +9,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.navigation.AppNavGraph
 import com.agathakazak.chatme.navigation.Screen
 import com.agathakazak.chatme.navigation.rememberNavigationState
+import com.agathakazak.chatme.presentation.login.LoginScreen
+import com.agathakazak.chatme.presentation.login.LoginState
+import com.agathakazak.chatme.presentation.login.LoginViewModel
 
 @Composable
 fun MainScreen() {
-    val viewModel:MainViewModel = viewModel()
+    val viewModel: LoginViewModel = viewModel()
     val logState = viewModel.loginState.observeAsState(LoginState.Initial)
     val navigationState = rememberNavigationState()
     Box(modifier = Modifier.fillMaxSize()) {
