@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.data.repository.UserRepository
-import com.agathakazak.chatme.domain.User
 import com.agathakazak.chatme.domain.UserLogin
 import com.agathakazak.chatme.domain.UserResponse
 import com.google.gson.Gson
@@ -45,6 +44,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             }
 
         }
+    }
+
+    fun changeLoginState(state: LoginState){
+        _loginState.value = state
     }
 
     private fun saveToken(token: String?) {

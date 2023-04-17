@@ -179,7 +179,7 @@ fun LoginScreen(
                 )
                 TextButton(
                     onClick = {
-
+                        viewModel.changeLoginState(LoginState.NotLogged)
                         onClickSignUp()
                     },
                     colors = ButtonDefaults.textButtonColors(

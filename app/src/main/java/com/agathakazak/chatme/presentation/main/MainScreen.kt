@@ -12,6 +12,7 @@ import com.agathakazak.chatme.navigation.rememberNavigationState
 import com.agathakazak.chatme.presentation.login.LoginScreen
 import com.agathakazak.chatme.presentation.login.LoginState
 import com.agathakazak.chatme.presentation.login.LoginViewModel
+import com.agathakazak.chatme.presentation.registration.RegistrationScreen
 
 @Composable
 fun MainScreen() {
