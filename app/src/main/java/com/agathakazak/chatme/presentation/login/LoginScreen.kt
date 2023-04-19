@@ -36,7 +36,7 @@ import com.agathakazak.chatme.presentation.isValidPhoneNumber
 @Composable
 fun LoginScreen(
     onClickSignUp: () -> Unit,
-    navigateToChats: () -> Unit
+    navigateToMainScreen: () -> Unit
 ) {
     val viewModel: LoginViewModel = viewModel()
     val loginState = viewModel.loginState.observeAsState(LoginState.Initial)
@@ -194,7 +194,7 @@ fun LoginScreen(
                 }
             }
         }
-        CheckLoginState(loginState, context, navigateToChats)
+        CheckLoginState(loginState, context, navigateToMainScreen)
     }
 }
 
@@ -220,20 +220,22 @@ private fun SetErrors(numberOrEmail: String, numberOrEmailError: Boolean) {
 private fun CheckLoginState(
     loginState: State<LoginState>,
     context: Context,
-    navigateToChats: () -> Unit
+    navigateToContentScreen: () -> Unit
 ) {
     when (loginState.value) {
         is LoginState.IsLogged -> {
-
+            navigateToContentScreen()
         }
         is LoginState.IsLoggingError -> {
-            Toast.makeText(context,  loginState.value.response?.data, Toast.LENGTH_SHORT).show()
+            LaunchedEffect(key1 = loginState) {
+                Toast.makeText(context, loginState.value.response?.data, Toast.LENGTH_SHORT).show()
+            }
         }
         is LoginState.Loading -> {
             CircularProgressIndicator(color = MaterialTheme.colors.secondary)
         }
         else -> {
-            navigateToChats()
+
         }
     }
 }

@@ -1,9 +1,8 @@
-package com.agathakazak.chatme.presentation
+package com.agathakazak.chatme.presentation.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.agathakazak.chatme.presentation.main.MainScreen
 import com.agathakazak.chatme.ui.theme.ChatMeTheme
 
 class MainActivity : ComponentActivity() {

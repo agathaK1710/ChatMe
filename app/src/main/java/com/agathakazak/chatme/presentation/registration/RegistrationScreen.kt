@@ -292,7 +292,8 @@ fun RegistrationScreen(
                                     lastName,
                                     phoneNumber,
                                     email,
-                                    password
+                                    password,
+                                    null
                                 )
                             )
                         }
