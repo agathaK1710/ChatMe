@@ -8,7 +8,7 @@ import com.agathakazak.chatme.domain.Chat
 @Composable
 fun ChatScreen(chats: List<Chat>) {
     LazyColumn {
-        items(items = chats, key = { it.user.email }){
+        items(items = chats, key = { it.user.email }) {
             ChatItem(user = it.user, message = it.message)
         }
     }

@@ -1,4 +1,4 @@
-package com.agathakazak.chatme.presentation.mainContent
+package com.agathakazak.chatme.presentation.main
 
 import com.agathakazak.chatme.R
 

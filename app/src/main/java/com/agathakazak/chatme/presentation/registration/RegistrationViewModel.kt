@@ -35,4 +35,8 @@ class RegistrationViewModel : ViewModel() {
         }
     }
 
+    fun changeRegistrationState(state: RegistrationState){
+        _registrationState.value = state
+    }
+
 }

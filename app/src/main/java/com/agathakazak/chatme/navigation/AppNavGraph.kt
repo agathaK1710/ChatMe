@@ -13,29 +13,29 @@ fun AppNavGraph(
     logState: LoginState,
     loginScreenContext: @Composable () -> Unit,
     registrationScreenContext: @Composable () -> Unit,
-    contentScreenContext: @Composable () -> Unit,
-    chatsScreenContext: @Composable () -> Unit
+    chatsScreenContext: @Composable () -> Unit,
+    searchScreenContext: @Composable () -> Unit,
+    settingsScreenContext: @Composable () -> Unit
 ) {
     NavHost(
         navController = navHostController,
         startDestination = if (logState is LoginState.IsLogged)
-            Screen.Content.route else Screen.Login.route
+            Screen.Chats.route else Screen.Login.route
     ) {
-
         composable(Screen.Login.route) {
             loginScreenContext()
         }
-
         composable(Screen.Registration.route) {
             registrationScreenContext()
         }
-
-        composable(Screen.Content.route) {
-            contentScreenContext()
-        }
-
-        composable(Screen.Chats.route) {
+        composable(Screen.Chats.route){
             chatsScreenContext()
+        }
+        composable(Screen.Search.route) {
+            searchScreenContext()
+        }
+        composable(Screen.Settings.route) {
+            settingsScreenContext()
         }
     }
 }
