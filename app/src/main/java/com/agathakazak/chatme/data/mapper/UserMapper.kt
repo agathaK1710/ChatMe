@@ -14,7 +14,7 @@ class UserMapper {
         phoneNumber = user.phoneNumber,
         email = user.email,
         password = user.password,
-        imageUrl = user.imageUrl
+        imageUrl = user.imageUrl.toString()
     )
 
     private fun mapUserDtoToModel(userDto: UserDto) = User(
@@ -23,7 +23,7 @@ class UserMapper {
         phoneNumber = userDto.phoneNumber,
         email = userDto.email,
         password = userDto.password,
-        imageUrl = userDto.imageUrl
+        imageUrl = userDto.imageUrl.toString()
     )
 
     fun mapUserLoginModelToDto(userLogin: UserLogin) = UserLoginDto(

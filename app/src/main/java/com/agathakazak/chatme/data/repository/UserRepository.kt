@@ -8,19 +8,26 @@ import com.agathakazak.chatme.domain.UserResponse
 
 class UserRepository {
     private val mapper = UserMapper()
+    private val apiService = ApiFactory.apiService
     suspend fun registerUser(user: User): UserResponse<String> {
         return mapper.mapUserResponseDtoToModel(
-            ApiFactory.apiService.registerUser(mapper.mapUserModelToDto(user))
+            apiService.registerUser(mapper.mapUserModelToDto(user))
         )
     }
 
     suspend fun loginUser(userLogin: UserLogin): UserResponse<String> {
         return mapper.mapUserResponseDtoToModel(
-            ApiFactory.apiService.loginUser(
+            apiService.loginUser(
                 mapper.mapUserLoginModelToDto(
                     userLogin
                 )
             )
+        )
+    }
+
+    suspend fun getUserByPhoneNumber(phoneNumber: String): UserResponse<User>{
+        return mapper.mapUserResponseDtoWithDataDtoToModel(
+            apiService.getUserByPhone(phoneNumber)
         )
     }
 }

@@ -42,6 +42,7 @@ import com.agathakazak.chatme.presentation.login.LoginViewModel
 import com.agathakazak.chatme.presentation.registration.RegistrationScreen
 import com.agathakazak.chatme.presentation.registration.RegistrationState
 import com.agathakazak.chatme.presentation.registration.RegistrationViewModel
+import com.agathakazak.chatme.presentation.search.SearchScreen
 
 @Composable
 fun MainScreen() {
@@ -80,6 +81,7 @@ fun MainScreen() {
             }
         }
     ) { paddingValues ->
+        menuState = logState.value == LoginState.IsLogged
         Row(modifier = Modifier.fillMaxSize()) {
             if (menuState) {
                 NavigationRail(
@@ -164,7 +166,7 @@ private fun NavigationGraph(
             ChatScreen(chats)
         },
         searchScreenContext = {
-            Text(text = "Search page", modifier = Modifier.fillMaxSize())
+            SearchScreen()
         },
         settingsScreenContext = {
             Text(text = "Settings page", modifier = Modifier.fillMaxSize())
