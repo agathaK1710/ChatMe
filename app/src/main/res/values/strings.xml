@@ -29,4 +29,5 @@
     <string name="number_email_error_message">Not valid phone number or email.</string>
     <string name="no_account_question">Don\'t have an account?</string>
     <string name="account_question">Already have an account?</string>
+    <string name="icn_search_back_content_description">come back\n</string>
 </resources>

@@ -1,27 +1,37 @@
 package com.agathakazak.chatme.presentation.main
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.NavigationRail
 import androidx.compose.material.NavigationRailItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextField
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -50,9 +60,14 @@ fun MainScreen() {
     val logState = loginViewModel.loginState.observeAsState(LoginState.Initial)
     var menuState by rememberSaveable { mutableStateOf((logState.value == LoginState.IsLogged)) }
     val navigationState = rememberNavigationState()
+    val focusRequester = remember{FocusRequester()}
+    val currentDestination =
+        navigationState.navHostController.currentBackStackEntryAsState().value?.destination
     val items = listOf(
         NavigationRailPages.CHATS, NavigationRailPages.SEARCH, NavigationRailPages.SETTINGS
     )
+    var search by rememberSaveable { mutableStateOf(false) }
+    var searchText by rememberSaveable { mutableStateOf("") }
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
             if (logState.value == LoginState.IsLogged) {
@@ -64,31 +79,94 @@ fun MainScreen() {
                         )
                     },
                     navigationIcon = {
-                        Icon(
-                            Icons.Filled.Menu,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .padding(start = 15.dp)
-                                .size(30.dp)
-                                .clickable {
-                                    menuState = !menuState
-                                },
-                            tint = Color.White
-                        )
+                        if (search){
+                          IconButton(onClick = {
+                              search = false
+                              searchText = ""
+                          }) {
+                              Icon(
+                                  Icons.Filled.ArrowBack,
+                                  contentDescription = null,
+                                  modifier = Modifier
+                                      .padding(start = 15.dp)
+                                      .size(25.dp),
+                                  tint = Color.White
+                              )
+                          }
+                        } else {
+                            IconButton(onClick = { menuState = !menuState }) {
+                                Icon(
+                                    Icons.Filled.Menu,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .size(30.dp),
+                                    tint = Color.White
+                                )
+                            }
+                        }
                     },
-                    backgroundColor = MaterialTheme.colors.primaryVariant
+                    backgroundColor = MaterialTheme.colors.primaryVariant,
+                    actions = {
+                        if (currentDestination?.route == Screen.Search.route) {
+                            if (search) {
+                                TextField(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .focusRequester(focusRequester),
+                                    value = searchText,
+                                    onValueChange = {
+                                        searchText = it
+                                    },
+                                    colors = TextFieldDefaults.textFieldColors(
+                                        backgroundColor = MaterialTheme.colors.primaryVariant,
+                                        textColor = Color.White,
+                                        cursorColor = Color.White
+                                    ),
+                                    placeholder = {
+                                        Text(text = "Search contact", color = Color.White)
+                                    },
+                                    maxLines = 1,
+                                    singleLine = true,
+                                    trailingIcon = {
+                                        if (searchText.isNotBlank()) {
+                                            IconButton(onClick = {
+                                                searchText = ""
+                                            }) {
+                                                Icon(
+                                                    Icons.Filled.Close,
+                                                    null,
+                                                    tint = Color.White
+                                                )
+                                            }
+                                        }
+                                    }
+                                )
+                                LaunchedEffect(search){
+                                    if(search) focusRequester.requestFocus()
+                                }
+                            }
+                            IconButton(onClick = {
+                                search = true
+                            }) {
+                                Icon(
+                                    imageVector = Icons.Filled.Search,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(25.dp),
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    }
                 )
             }
         }
     ) { paddingValues ->
-        menuState = logState.value == LoginState.IsLogged
         Row(modifier = Modifier.fillMaxSize()) {
             if (menuState) {
                 NavigationRail(
                     modifier = Modifier.padding(paddingValues)
                 ) {
-                    val currentDestination =
-                        navigationState.navHostController.currentBackStackEntryAsState().value?.destination
                     items.forEach { page ->
                         val selected = currentDestination?.route?.let { it == page.route } ?: false
                         NavigationRailItem(
@@ -110,6 +188,8 @@ fun MainScreen() {
                             selectedContentColor = MaterialTheme.colors.primaryVariant,
                             unselectedContentColor = MaterialTheme.colors.onSecondary,
                             onClick = {
+                                search = false
+                                searchText = ""
                                 navigationState.navHostController.navigate(page.route)
                             }
                         )
