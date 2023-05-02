@@ -1,23 +1,24 @@
 package com.agathakazak.chatme.presentation.login
 
-import android.app.Application
-import android.content.Context
-import androidx.lifecycle.AndroidViewModel
+import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.agathakazak.chatme.data.repository.UserRepository
-import com.agathakazak.chatme.domain.UserLogin
-import com.agathakazak.chatme.domain.UserResponse
+import com.agathakazak.chatme.domain.entity.UserLogin
+import com.agathakazak.chatme.domain.entity.UserResponse
+import com.agathakazak.chatme.domain.usecases.LoginUserUseCase
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
+import javax.inject.Inject
 
 
-class LoginViewModel(application: Application) : AndroidViewModel(application) {
-    private val userRepository = UserRepository()
-    private val sharedPreferences = application.getSharedPreferences("chatMe", Context.MODE_PRIVATE)
+class LoginViewModel @Inject constructor(
+    private val sharedPreferences: SharedPreferences,
+    private val loginUserUseCase: LoginUserUseCase
+): ViewModel() {
 
     private val _loginState = MutableLiveData<LoginState>(LoginState.Initial)
     val loginState: LiveData<LoginState> = _loginState
@@ -32,7 +33,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 _loginState.value = LoginState.Loading
                 delay(1000)
-                val response: UserResponse<String> = userRepository.loginUser(userLogin)
+                val response: UserResponse<String> = loginUserUseCase(userLogin)
                 val token = if (response.success) response.data else null
                 saveToken(token)
                 _loginState.value = LoginState.IsLogged

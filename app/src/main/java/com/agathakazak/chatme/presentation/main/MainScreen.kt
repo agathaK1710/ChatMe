@@ -37,14 +37,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.agathakazak.chatme.R
-import com.agathakazak.chatme.domain.Chat
-import com.agathakazak.chatme.domain.User
+import com.agathakazak.chatme.domain.entity.Chat
+import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.navigation.AppNavGraph
 import com.agathakazak.chatme.navigation.NavigationState
 import com.agathakazak.chatme.navigation.Screen
 import com.agathakazak.chatme.navigation.rememberNavigationState
+import com.agathakazak.chatme.presentation.ViewModelFactory
 import com.agathakazak.chatme.presentation.chats.ChatScreen
 import com.agathakazak.chatme.presentation.login.LoginScreen
 import com.agathakazak.chatme.presentation.login.LoginState
@@ -55,8 +57,8 @@ import com.agathakazak.chatme.presentation.registration.RegistrationViewModel
 import com.agathakazak.chatme.presentation.search.SearchScreen
 
 @Composable
-fun MainScreen() {
-    val loginViewModel: LoginViewModel = viewModel()
+fun MainScreen(viewModelFactory: ViewModelFactory) {
+    val loginViewModel: LoginViewModel = viewModel(factory = viewModelFactory)
     val logState = loginViewModel.loginState.observeAsState(LoginState.Initial)
     var menuState by rememberSaveable { mutableStateOf((logState.value == LoginState.IsLogged)) }
     val navigationState = rememberNavigationState()
@@ -196,7 +198,7 @@ fun MainScreen() {
                     }
                 }
             }
-            NavigationGraph(navigationState, loginViewModel, logState)
+            NavigationGraph(navigationState, loginViewModel, viewModelFactory, logState)
         }
     }
 }
@@ -205,9 +207,10 @@ fun MainScreen() {
 private fun NavigationGraph(
     navigationState: NavigationState,
     loginViewModel: LoginViewModel,
+    viewModelFactory: ViewModelFactory,
     logState: State<LoginState>
 ) {
-    val registrationViewModel: RegistrationViewModel = viewModel()
+    val registrationViewModel: RegistrationViewModel = viewModel(factory = viewModelFactory)
     AppNavGraph(
         navHostController = navigationState.navHostController,
         logState.value,
@@ -219,7 +222,8 @@ private fun NavigationGraph(
                 navigateToMainScreen = {
                     loginViewModel.changeLoginState(LoginState.IsLogged)
                     navigationState.navigateTo(Screen.Chats.route)
-                }
+                },
+                viewModelFactory
             )
         },
         registrationScreenContext = {
@@ -227,7 +231,8 @@ private fun NavigationGraph(
                 onClickSignIn = {
                     registrationViewModel.changeRegistrationState(RegistrationState.IsRegistered)
                     navigationState.navigateTo(Screen.Login.route)
-                }
+                },
+                viewModelFactory
             )
         },
         chatsScreenContext = {
@@ -246,7 +251,7 @@ private fun NavigationGraph(
             ChatScreen(chats)
         },
         searchScreenContext = {
-            SearchScreen()
+            SearchScreen(viewModelFactory)
         },
         settingsScreenContext = {
             Text(text = "Settings page", modifier = Modifier.fillMaxSize())

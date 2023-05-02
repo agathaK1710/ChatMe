@@ -3,11 +3,12 @@ package com.agathakazak.chatme.data.mapper
 import com.agathakazak.chatme.data.model.UserDto
 import com.agathakazak.chatme.data.model.UserLoginDto
 import com.agathakazak.chatme.data.model.UserResponseDto
-import com.agathakazak.chatme.domain.User
-import com.agathakazak.chatme.domain.UserLogin
-import com.agathakazak.chatme.domain.UserResponse
+import com.agathakazak.chatme.domain.entity.User
+import com.agathakazak.chatme.domain.entity.UserLogin
+import com.agathakazak.chatme.domain.entity.UserResponse
+import javax.inject.Inject
 
-class UserMapper {
+class UserMapper @Inject constructor(){
     fun mapUserModelToDto(user: User) = UserDto(
         firstName = user.firstName,
         lastName = user.lastName,

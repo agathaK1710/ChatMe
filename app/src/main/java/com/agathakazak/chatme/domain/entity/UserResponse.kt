@@ -1,4 +1,4 @@
-package com.agathakazak.chatme.domain
+package com.agathakazak.chatme.domain.entity
 
 data class UserResponse<T>(
     val success: Boolean,

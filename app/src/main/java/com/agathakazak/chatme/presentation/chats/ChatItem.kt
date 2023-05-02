@@ -17,10 +17,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
-import com.agathakazak.chatme.domain.User
+import com.agathakazak.chatme.domain.entity.User
 
 @Composable
-fun ChatItem(user:User, message: String) {
+fun ChatItem(user: User, message: String) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         backgroundColor = MaterialTheme.colors.background

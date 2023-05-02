@@ -22,12 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.agathakazak.chatme.presentation.ViewModelFactory
 
 @Composable
-fun SearchScreen() {
+fun SearchScreen(
+    viewModelFactory: ViewModelFactory
+) {
     val context = LocalContext.current
     val activity = context as Activity
-    val viewModel: SearchViewModel = viewModel()
+    val viewModel: SearchViewModel = viewModel(factory = viewModelFactory)
     val searchScreenState = viewModel.searchScreenState.observeAsState(SearchScreenState.Initial)
     Box(modifier = Modifier.fillMaxSize()) {
         if (!hasPermission(context)) {

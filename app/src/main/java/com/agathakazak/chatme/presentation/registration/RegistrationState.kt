@@ -1,6 +1,6 @@
 package com.agathakazak.chatme.presentation.registration
 
-import com.agathakazak.chatme.domain.UserResponse
+import com.agathakazak.chatme.domain.entity.UserResponse
 
 sealed class RegistrationState(val response: UserResponse<String>? = null) {
     object Initial : RegistrationState()

@@ -48,7 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
-import com.agathakazak.chatme.domain.UserLogin
+import com.agathakazak.chatme.domain.entity.UserLogin
+import com.agathakazak.chatme.presentation.ViewModelFactory
 import com.agathakazak.chatme.presentation.isValidEmail
 import com.agathakazak.chatme.presentation.isValidPassword
 import com.agathakazak.chatme.presentation.isValidPhoneNumber
@@ -56,9 +57,10 @@ import com.agathakazak.chatme.presentation.isValidPhoneNumber
 @Composable
 fun LoginScreen(
     onClickSignUp: () -> Unit,
-    navigateToMainScreen: () -> Unit
+    navigateToMainScreen: () -> Unit,
+    viewModelFactory: ViewModelFactory
 ) {
-    val viewModel: LoginViewModel = viewModel()
+    val viewModel: LoginViewModel = viewModel(factory = viewModelFactory)
     val loginState = viewModel.loginState.observeAsState(LoginState.Initial)
     val context = LocalContext.current
     var numberOrEmail by rememberSaveable { mutableStateOf("") }

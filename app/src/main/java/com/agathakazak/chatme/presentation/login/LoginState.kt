@@ -1,6 +1,6 @@
 package com.agathakazak.chatme.presentation.login
 
-import com.agathakazak.chatme.domain.UserResponse
+import com.agathakazak.chatme.domain.entity.UserResponse
 
 sealed class LoginState(val response: UserResponse<String>? = null) {
 

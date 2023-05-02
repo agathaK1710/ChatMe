@@ -48,7 +48,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
-import com.agathakazak.chatme.domain.User
+import com.agathakazak.chatme.domain.entity.User
+import com.agathakazak.chatme.presentation.ViewModelFactory
 import com.agathakazak.chatme.presentation.isValidEmail
 import com.agathakazak.chatme.presentation.isValidPassword
 import com.agathakazak.chatme.presentation.isValidPhoneNumber
@@ -56,9 +57,10 @@ import com.agathakazak.chatme.presentation.isValidPhoneNumber
 
 @Composable
 fun RegistrationScreen(
-    onClickSignIn: () -> Unit
+    onClickSignIn: () -> Unit,
+    viewModelFactory: ViewModelFactory
 ) {
-    val viewModel: RegistrationViewModel = viewModel()
+    val viewModel: RegistrationViewModel = viewModel(factory = viewModelFactory)
     val registrationState = viewModel.registrationState.observeAsState(RegistrationState.Initial)
     val context = LocalContext.current
     var firstName by rememberSaveable { mutableStateOf("") }
