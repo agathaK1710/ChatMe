@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.domain.entity.User
-import com.agathakazak.chatme.domain.entity.UserResponse
+import com.agathakazak.chatme.domain.entity.SimpleResponse
 import com.agathakazak.chatme.domain.usecases.RegisterUserUseCase
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
@@ -29,9 +29,9 @@ class RegistrationViewModel @Inject constructor(
             } catch (e: HttpException) {
                 val responseString = e.response()?.errorBody()?.string()
                 val gson = Gson()
-                val response = gson.fromJson(responseString, UserResponse::class.java)
+                val response = gson.fromJson(responseString, SimpleResponse::class.java)
                 _registrationState.value =
-                    RegistrationState.IsRegistrationError(response as UserResponse<String>)
+                    RegistrationState.IsRegistrationError(response as SimpleResponse<String>)
             }
         }
     }

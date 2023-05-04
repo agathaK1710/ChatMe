@@ -1,6 +1,6 @@
 package com.agathakazak.chatme.domain.entity
 
-data class UserResponse<T>(
+data class SimpleResponse<T>(
     val success: Boolean,
     val data: T
 )

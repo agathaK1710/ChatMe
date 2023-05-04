@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.domain.entity.UserLogin
-import com.agathakazak.chatme.domain.entity.UserResponse
+import com.agathakazak.chatme.domain.entity.SimpleResponse
 import com.agathakazak.chatme.domain.usecases.LoginUserUseCase
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
@@ -33,15 +33,15 @@ class LoginViewModel @Inject constructor(
             try {
                 _loginState.value = LoginState.Loading
                 delay(1000)
-                val response: UserResponse<String> = loginUserUseCase(userLogin)
+                val response: SimpleResponse<String> = loginUserUseCase(userLogin)
                 val token = if (response.success) response.data else null
                 saveToken(token)
                 _loginState.value = LoginState.IsLogged
             } catch (e: HttpException) {
                 val responseString = e.response()?.errorBody()?.string()
                 val gson = Gson()
-                val response = gson.fromJson(responseString, UserResponse::class.java)
-                _loginState.value = LoginState.IsLoggingError(response as UserResponse<String>)
+                val response = gson.fromJson(responseString, SimpleResponse::class.java)
+                _loginState.value = LoginState.IsLoggingError(response as SimpleResponse<String>)
             }
 
         }
