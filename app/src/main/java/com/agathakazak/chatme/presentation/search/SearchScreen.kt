@@ -5,6 +5,9 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.provider.ContactsContract
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,18 +33,33 @@ fun SearchScreen(
     viewModelFactory: ViewModelFactory
 ) {
     val context = LocalContext.current
-    val activity = context as Activity
     val viewModel: SearchViewModel = viewModel(factory = viewModelFactory)
     val searchScreenState = viewModel.searchScreenState.observeAsState(SearchScreenState.Initial)
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (!hasPermission(context)) {
-            ActivityCompat.requestPermissions(
-                activity,
-                arrayOf(Manifest.permission.READ_CONTACTS),
-                1
-            )
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            viewModel.getRegisteredContacts(getAllPhoneNumbersList(context))
+            Log.d("SearchScreen","PERMISSION GRANTED")
+
         } else {
-            viewModel.getRegisteredContacts(getAllContactsList(context))
+            Log.d("SearchScreen","PERMISSION DENIED")
+        }
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (PackageManager.PERMISSION_GRANTED) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.READ_CONTACTS
+            ) -> {
+                viewModel.getRegisteredContacts(getAllPhoneNumbersList(context))
+                Log.d("SearchScreen","Code requires permission")
+            }
+            else -> {
+                SideEffect {
+                    launcher.launch(Manifest.permission.READ_CONTACTS)
+                }
+            }
         }
         Column(
             modifier = Modifier.fillMaxSize()
@@ -48,31 +67,32 @@ fun SearchScreen(
             when (val currentState = searchScreenState.value) {
                 is SearchScreenState.Initial -> {}
                 is SearchScreenState.Contacts -> {
-                    Text(
-                        modifier = Modifier.padding(5.dp),
-                        text = "Users from your contacts:",
-                        color = MaterialTheme.colors.primaryVariant,
-                        fontWeight = FontWeight.Bold
-                    )
-                    LazyColumn {
-                        items(items = currentState.contacts, key = { it.number }) {
-                            ContactItem(contact = it)
+                    if (currentState.contacts.isNotEmpty()) {
+                        Text(
+                            modifier = Modifier.padding(5.dp),
+                            text = "Users from your contacts:",
+                            color = MaterialTheme.colors.primaryVariant,
+                            fontWeight = FontWeight.Bold
+                        )
+                        LazyColumn {
+                            items(items = currentState.contacts, key = { it.phoneNumber }) {
+                                ContactItem(it)
+                            }
                         }
+                    } else {
+                        Text(
+                            modifier = Modifier.padding(5.dp),
+                            text = "Nobody from your contacts is registered in ChatMe.",
+                            color = MaterialTheme.colors.onSecondary
+                        )
                     }
                 }
             }
         }
     }
 }
-
-fun hasPermission(context: Context) =
-    ContextCompat.checkSelfPermission(
-        context,
-        Manifest.permission.READ_CONTACTS
-    ) == PackageManager.PERMISSION_GRANTED
-
-private fun getAllContactsList(context: Context): List<Contact> {
-    val contacts = mutableListOf<Contact>()
+private fun getAllPhoneNumbersList(context: Context): List<String> {
+    val phoneNumbers = mutableListOf<String>()
     val phones = context.contentResolver.query(
         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
         null,
@@ -82,16 +102,12 @@ private fun getAllContactsList(context: Context): List<Contact> {
     )
     if (phones != null) {
         while (phones.moveToNext()) {
-            val name = phones.getString(
-                phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
-            )
             val phoneNumber = phones.getString(
                 phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
             )
-            val contact = Contact(name, phoneNumber)
-            contacts.add(contact)
+            phoneNumbers.add(phoneNumber)
         }
     }
     phones?.close()
-    return contacts
+    return phoneNumbers
 }

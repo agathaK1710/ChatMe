@@ -17,7 +17,8 @@ class UserMapper @Inject constructor() {
         phoneNumber = user.phoneNumber,
         email = user.email,
         password = user.password,
-        imageUrl = user.imageUrl
+        imageUrl = user.imageUrl,
+        stubImageColor = user.stubImageColor
     )
 
     private fun mapUserDtoToModel(userDto: UserDto) = User(
@@ -26,7 +27,8 @@ class UserMapper @Inject constructor() {
         phoneNumber = userDto.phoneNumber,
         email = userDto.email,
         password = userDto.password,
-        imageUrl = userDto.imageUrl
+        imageUrl = userDto.imageUrl,
+        stubImageColor = userDto.stubImageColor
     )
 
     fun mapUserLoginModelToDto(userLogin: UserLogin) = UserLoginDto(

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.agathakazak.chatme.data.repository.UserRepositoryImpl
+import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.usecases.GetUserByPhoneNumberUseCase
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -17,23 +17,22 @@ class SearchViewModel @Inject constructor(
     private val _searchScreenState = MutableLiveData<SearchScreenState>(SearchScreenState.Initial)
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
 
-    fun getRegisteredContacts(allContacts: List<Contact>) {
-        val registeredContacts = mutableListOf<Contact>()
+    fun getRegisteredContacts(allContacts: List<String>) {
+        val registeredUsers = mutableListOf<User>()
         viewModelScope.launch {
             allContacts.forEach {
                 try {
-                    val phoneNumber = it.number.filter { !it.isWhitespace() }
+                    val phoneNumber = it.filter { !it.isWhitespace() }
                     val user = getUserByPhoneNumberUseCase(phoneNumber).data
-                    registeredContacts.add(
-                        Contact(
-                            name = "${user.firstName} ${user.lastName}",
-                            user.phoneNumber
-                        )
-                    )
+                    registeredUsers.add(user)
                 } catch (_: HttpException) {
                 }
             }
-            _searchScreenState.value = SearchScreenState.Contacts(registeredContacts)
+            _searchScreenState.value = SearchScreenState.Contacts(registeredUsers)
         }
+    }
+
+    fun changeSearchScreenState(screenState: SearchScreenState){
+        _searchScreenState.value = screenState
     }
 }

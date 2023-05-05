@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -244,7 +245,8 @@ private fun NavigationGraph(
                     "+375444977921",
                     "agatha.kazak@gmail.com $it",
                     "vsd",
-                    "https://sun9-31.userapi.com/impg/pauakvL_KO6RwebwYJhMH6fWi7FCSB3FSHrYLQ/tvPWQJmREao.jpg?size=1440x2160&quality=95&sign=35628ec8352dba59f2a42252c62f49a7&type=album"
+                    "https://sun9-31.userapi.com/impg/pauakvL_KO6RwebwYJhMH6fWi7FCSB3FSHrYLQ/tvPWQJmREao.jpg?size=1440x2160&quality=95&sign=35628ec8352dba59f2a42252c62f49a7&type=album",
+                    stubImageColor = LocalContext.current.getColor(R.color.purple_200)
                 )
                 chats.add(Chat(user, "message $it"))
             }

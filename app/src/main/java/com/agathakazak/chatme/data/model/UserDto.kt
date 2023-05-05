@@ -8,5 +8,6 @@ data class UserDto(
     @SerializedName("phone_number") val phoneNumber: String,
     @SerializedName("email") val email: String,
     @SerializedName("password") val password: String? = null,
-    @SerializedName("image_url") val imageUrl: String?
+    @SerializedName("image_url") val imageUrl: String?,
+    @SerializedName("stub_image_color") val stubImageColor: Int
 )

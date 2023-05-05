@@ -308,6 +308,7 @@ fun RegistrationScreen(
                         if (!firstNameError && !lastNameError && !phoneError
                             && !emailError && !passwordError && !repeatedPasswordError
                         ) {
+                            val color = context.resources.getIntArray(R.array.colors).random()
                             viewModel.registerUser(
                                 User(
                                     firstName,
@@ -315,7 +316,8 @@ fun RegistrationScreen(
                                     phoneNumber,
                                     email,
                                     password,
-                                    null
+                                    null,
+                                    color
                                 )
                             )
                         }
@@ -390,15 +392,18 @@ private fun CheckRegistrationState(
         is RegistrationState.IsRegistered -> {
             navigateToLogin()
         }
+
         is RegistrationState.IsRegistrationError -> {
             LaunchedEffect(key1 = registrationState) {
                 Toast.makeText(context, registrationState.value.response?.data, Toast.LENGTH_SHORT)
                     .show()
             }
         }
+
         is RegistrationState.Loading -> {
             CircularProgressIndicator(color = MaterialTheme.colors.secondary)
         }
+
         else -> {
         }
     }
