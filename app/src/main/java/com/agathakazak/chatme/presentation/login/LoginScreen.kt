@@ -250,7 +250,7 @@ private fun CheckLoginState(
         }
         is LoginState.IsLoggingError -> {
             LaunchedEffect(key1 = loginState) {
-                Toast.makeText(context, loginState.value.response?.data, Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, loginState.value.response, Toast.LENGTH_SHORT).show()
             }
         }
         is LoginState.Loading -> {

@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.domain.entity.User
-import com.agathakazak.chatme.domain.usecases.GetUserByPhoneNumberUseCase
+import com.agathakazak.chatme.domain.usecase.GetUserByPhoneNumberUseCase
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -23,16 +23,12 @@ class SearchViewModel @Inject constructor(
             allContacts.forEach {
                 try {
                     val phoneNumber = it.filter { !it.isWhitespace() }
-                    val user = getUserByPhoneNumberUseCase(phoneNumber).data
+                    val user = getUserByPhoneNumberUseCase(phoneNumber)
                     registeredUsers.add(user)
                 } catch (_: HttpException) {
                 }
             }
             _searchScreenState.value = SearchScreenState.Contacts(registeredUsers)
         }
-    }
-
-    fun changeSearchScreenState(screenState: SearchScreenState){
-        _searchScreenState.value = screenState
     }
 }

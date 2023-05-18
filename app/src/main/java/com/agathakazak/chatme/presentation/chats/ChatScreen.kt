@@ -3,13 +3,24 @@ package com.agathakazak.chatme.presentation.chats
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import com.agathakazak.chatme.domain.entity.Chat
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.agathakazak.chatme.presentation.ViewModelFactory
 
 @Composable
-fun ChatScreen(chats: List<Chat>) {
-    LazyColumn {
-        items(items = chats, key = { it.user.email }) {
-            ChatItem(user = it.user, message = it.message)
+fun ChatScreen(viewModelFactory: ViewModelFactory) {
+    val chatViewModel = viewModel<ChatViewModel>(factory = viewModelFactory)
+    val screenState = chatViewModel.chatScreenState.observeAsState(ChatScreenState.Initial)
+
+    when (val currentState = screenState.value) {
+        is ChatScreenState.AllChats -> {
+            LazyColumn{
+                items(items = currentState.chats, key = { it.companion.id }) {
+                     ChatItem(it.companion, it.lastMessage, it.isUnread)
+                }
+            }
         }
+        else -> {}
     }
+
 }

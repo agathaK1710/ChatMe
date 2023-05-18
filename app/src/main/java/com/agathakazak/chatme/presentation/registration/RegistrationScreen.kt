@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.User
+import com.agathakazak.chatme.domain.entity.UserRegister
 import com.agathakazak.chatme.presentation.ViewModelFactory
 import com.agathakazak.chatme.presentation.isValidEmail
 import com.agathakazak.chatme.presentation.isValidPassword
@@ -310,7 +311,7 @@ fun RegistrationScreen(
                         ) {
                             val color = context.resources.getIntArray(R.array.colors).random()
                             viewModel.registerUser(
-                                User(
+                                UserRegister(
                                     firstName,
                                     lastName,
                                     phoneNumber,
@@ -395,7 +396,7 @@ private fun CheckRegistrationState(
 
         is RegistrationState.IsRegistrationError -> {
             LaunchedEffect(key1 = registrationState) {
-                Toast.makeText(context, registrationState.value.response?.data, Toast.LENGTH_SHORT)
+                Toast.makeText(context, registrationState.value.response, Toast.LENGTH_SHORT)
                     .show()
             }
         }

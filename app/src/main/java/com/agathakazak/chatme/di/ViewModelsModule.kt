@@ -1,6 +1,7 @@
 package com.agathakazak.chatme.di
 
 import androidx.lifecycle.ViewModel
+import com.agathakazak.chatme.presentation.chats.ChatViewModel
 import com.agathakazak.chatme.presentation.login.LoginViewModel
 import com.agathakazak.chatme.presentation.registration.RegistrationViewModel
 import com.agathakazak.chatme.presentation.search.SearchViewModel
@@ -25,4 +26,9 @@ interface ViewModelsModule {
     @ViewModelKey(SearchViewModel::class)
     @Binds
     fun bindSearchViewModel(viewModel: SearchViewModel): ViewModel
+
+    @IntoMap
+    @ViewModelKey(ChatViewModel::class)
+    @Binds
+    fun bindChatViewModel(viewModel: ChatViewModel): ViewModel
 }

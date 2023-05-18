@@ -237,20 +237,7 @@ private fun NavigationGraph(
             )
         },
         chatsScreenContext = {
-            val chats = mutableListOf<Chat>()
-            repeat(15) {
-                val user = User(
-                    "Agatha $it",
-                    "Kazak",
-                    "+375444977921",
-                    "agatha.kazak@gmail.com $it",
-                    "vsd",
-                    "https://sun9-31.userapi.com/impg/pauakvL_KO6RwebwYJhMH6fWi7FCSB3FSHrYLQ/tvPWQJmREao.jpg?size=1440x2160&quality=95&sign=35628ec8352dba59f2a42252c62f49a7&type=album",
-                    stubImageColor = LocalContext.current.getColor(R.color.purple_200)
-                )
-                chats.add(Chat(user, "message $it"))
-            }
-            ChatScreen(chats)
+            ChatScreen(viewModelFactory)
         },
         searchScreenContext = {
             SearchScreen(viewModelFactory)

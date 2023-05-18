@@ -2,25 +2,25 @@ package com.agathakazak.chatme.data.repository
 
 import com.agathakazak.chatme.data.mapper.UserMapper
 import com.agathakazak.chatme.data.network.ApiService
-import com.agathakazak.chatme.domain.entity.Message
+import com.agathakazak.chatme.domain.entity.Chat
+import com.agathakazak.chatme.domain.entity.MessageRequest
+import com.agathakazak.chatme.domain.entity.Response
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.entity.UserLogin
-import com.agathakazak.chatme.domain.entity.SimpleResponse
-import com.agathakazak.chatme.domain.repositoty.UserRepository
+import com.agathakazak.chatme.domain.entity.UserRegister
+import com.agathakazak.chatme.domain.repository.UserRepository
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     private val mapper: UserMapper,
     private val apiService: ApiService
 ) : UserRepository {
-    override suspend fun registerUser(user: User): SimpleResponse<String> {
-        return mapper.mapSimpleResponseDtoToModel(
-            apiService.registerUser(mapper.mapUserModelToDto(user))
-        )
+    override suspend fun registerUser(user: UserRegister) {
+        return apiService.registerUser(mapper.mapUserRegisterModelToDto(user))
     }
 
-    override suspend fun loginUser(userLogin: UserLogin): SimpleResponse<String> {
-        return mapper.mapSimpleResponseDtoToModel(
+    override suspend fun loginUser(userLogin: UserLogin): Response<String> {
+        return mapper.mapResponseDtoToModel(
             apiService.loginUser(
                 mapper.mapUserLoginModelToDto(
                     userLogin
@@ -29,23 +29,32 @@ class UserRepositoryImpl @Inject constructor(
         )
     }
 
-    override suspend fun getUserByPhoneNumber(phoneNumber: String): SimpleResponse<User> {
-        return mapper.mapSimpleResponseDtoWithUserDtoToModel(
+    override suspend fun getUserByToken(token: String): User {
+        return mapper.mapUserDtoToModel(apiService.getUserByToken(token))
+    }
+
+    override suspend fun getUserByPhoneNumber(phoneNumber: String): User {
+        return mapper.mapUserDtoToModel(
             apiService.getUserByPhone(phoneNumber)
         )
     }
 
-    override suspend fun getChat(recipientId: Int): SimpleResponse<List<Message>> {
-        return mapper.mapMessageResponse(apiService.getChat(recipientId))
+    override suspend fun getUserById(userId: Int): User {
+        return mapper.mapUserDtoToModel(apiService.getUserById(userId))
+    }
+
+    override suspend fun getChatsForUser(userId: Int): List<Chat> {
+        return apiService.getChatsForUser(userId).map {
+            val companionUser = apiService.getUserById(it.companionId)
+            mapper.mapLChatDtoToModel(it, companionUser)
+        }
     }
 
     override suspend fun sendMessage(
-        message: Message,
-        recipientId: Int
-    ): SimpleResponse<String> {
-        return mapper.mapSimpleResponseDtoToModel(apiService.sendMessage(
-            recipientId,
-            mapper.mapMessageModelToDto(message)
-        ))
+        messageRequest: MessageRequest
+    ): String {
+        return apiService.sendMessage(
+            mapper.mapMessageRequestModelToDto(messageRequest)
+        )
     }
 }

@@ -5,8 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.domain.entity.User
-import com.agathakazak.chatme.domain.entity.SimpleResponse
-import com.agathakazak.chatme.domain.usecases.RegisterUserUseCase
+import com.agathakazak.chatme.domain.entity.UserRegister
+import com.agathakazak.chatme.domain.usecase.RegisterUserUseCase
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -19,7 +19,7 @@ class RegistrationViewModel @Inject constructor(
     private val _registrationState = MutableLiveData<RegistrationState>(RegistrationState.Initial)
     val registrationState: LiveData<RegistrationState> = _registrationState
 
-    fun registerUser(user: User) {
+    fun registerUser(user: UserRegister) {
         viewModelScope.launch {
             try {
                 _registrationState.value = RegistrationState.Loading
@@ -28,10 +28,8 @@ class RegistrationViewModel @Inject constructor(
                 _registrationState.value = RegistrationState.IsRegistered
             } catch (e: HttpException) {
                 val responseString = e.response()?.errorBody()?.string()
-                val gson = Gson()
-                val response = gson.fromJson(responseString, SimpleResponse::class.java)
                 _registrationState.value =
-                    RegistrationState.IsRegistrationError(response as SimpleResponse<String>)
+                    responseString?.let { RegistrationState.IsRegistrationError(it) }
             }
         }
     }

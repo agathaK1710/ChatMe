@@ -1,32 +1,42 @@
 package com.agathakazak.chatme.data.mapper
 
+import com.agathakazak.chatme.data.model.ChatDto
 import com.agathakazak.chatme.data.model.MessageDto
+import com.agathakazak.chatme.data.model.MessageRequestDto
+import com.agathakazak.chatme.data.model.ResponseDto
 import com.agathakazak.chatme.data.model.UserDto
 import com.agathakazak.chatme.data.model.UserLoginDto
-import com.agathakazak.chatme.data.model.SimpleResponseDto
+import com.agathakazak.chatme.data.model.UserRegisterDto
+import com.agathakazak.chatme.domain.entity.Chat
 import com.agathakazak.chatme.domain.entity.Message
+import com.agathakazak.chatme.domain.entity.MessageRequest
+import com.agathakazak.chatme.domain.entity.Response
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.entity.UserLogin
-import com.agathakazak.chatme.domain.entity.SimpleResponse
+import com.agathakazak.chatme.domain.entity.UserRegister
 import javax.inject.Inject
 
 class UserMapper @Inject constructor() {
     fun mapUserModelToDto(user: User) = UserDto(
+        id = user.id,
         firstName = user.firstName,
         lastName = user.lastName,
         phoneNumber = user.phoneNumber,
         email = user.email,
-        password = user.password,
         imageUrl = user.imageUrl,
         stubImageColor = user.stubImageColor
     )
 
-    private fun mapUserDtoToModel(userDto: UserDto) = User(
+    fun <T> mapResponseDtoToModel(responseDto: ResponseDto<T>) = Response<T>(
+        data = responseDto.data
+    )
+
+    fun mapUserDtoToModel(userDto: UserDto) = User(
+        id = userDto.id,
         firstName = userDto.firstName,
         lastName = userDto.lastName,
         phoneNumber = userDto.phoneNumber,
         email = userDto.email,
-        password = userDto.password,
         imageUrl = userDto.imageUrl,
         stubImageColor = userDto.stubImageColor
     )
@@ -36,21 +46,8 @@ class UserMapper @Inject constructor() {
         password = userLogin.password
     )
 
-    fun <T> mapSimpleResponseDtoToModel(simpleResponseDto: SimpleResponseDto<T>): SimpleResponse<T> {
-        return SimpleResponse(
-            success = simpleResponseDto.success,
-            data = simpleResponseDto.data
-        )
-    }
-
-    fun mapSimpleResponseDtoWithUserDtoToModel(userResponseDto: SimpleResponseDto<UserDto>): SimpleResponse<User> {
-        return SimpleResponse(
-            success = userResponseDto.success,
-            data = mapUserDtoToModel(userResponseDto.data)
-        )
-    }
-
-    fun mapMessageDtoToModel(messageDto: MessageDto) = Message(
+    private fun mapMessageDtoToModel(messageDto: MessageDto) = Message(
+        id = messageDto.id,
         senderId = messageDto.senderId,
         recipientId = messageDto.recipientId,
         messageText = messageDto.messageText,
@@ -59,7 +56,12 @@ class UserMapper @Inject constructor() {
         isUnread = messageDto.isUnread
     )
 
+    fun mapMessageDtoListToModelList(messageDtoList: List<MessageDto>): List<Message> {
+        return messageDtoList.map { mapMessageDtoToModel(it) }
+    }
+
     fun mapMessageModelToDto(message: Message) = MessageDto(
+        id = message.id,
         senderId = message.senderId,
         recipientId = message.recipientId,
         messageText = message.messageText,
@@ -68,13 +70,28 @@ class UserMapper @Inject constructor() {
         isUnread = message.isUnread
     )
 
-    fun mapMessageResponse(messageResponse: SimpleResponseDto<List<MessageDto>>):
-            SimpleResponse<List<Message>> {
-        return SimpleResponse(
-            success = messageResponse.success,
-            data = messageResponse.data.map {
-                mapMessageDtoToModel(it)
-            }
+    fun mapMessageRequestModelToDto(messageRequest: MessageRequest) = MessageRequestDto(
+        senderId = messageRequest.senderId,
+        recipientId = messageRequest.recipientId,
+        messageText = messageRequest.messageText,
+        attachmentId = messageRequest.attachmentId
+    )
+
+    fun mapUserRegisterModelToDto(userRegister: UserRegister) = UserRegisterDto(
+        firstName = userRegister.firstName,
+        lastName = userRegister.lastName,
+        phoneNumber = userRegister.phoneNumber,
+        email = userRegister.email,
+        password = userRegister.password,
+        imageUrl = userRegister.imageUrl,
+        stubImageColor = userRegister.stubImageColor
+    )
+
+    fun mapLChatDtoToModel(chatsDto: ChatDto, companion: UserDto): Chat {
+        return Chat(
+            companion = mapUserDtoToModel(companion),
+            lastMessage = chatsDto.lastMessage,
+            isUnread = chatsDto.isUnread
         )
     }
 }

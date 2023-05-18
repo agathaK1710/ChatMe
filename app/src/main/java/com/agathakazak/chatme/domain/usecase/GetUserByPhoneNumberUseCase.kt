@@ -1,6 +1,6 @@
-package com.agathakazak.chatme.domain.usecases
+package com.agathakazak.chatme.domain.usecase
 
-import com.agathakazak.chatme.domain.repositoty.UserRepository
+import com.agathakazak.chatme.domain.repository.UserRepository
 import javax.inject.Inject
 
 class GetUserByPhoneNumberUseCase @Inject constructor(

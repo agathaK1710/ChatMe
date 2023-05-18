@@ -4,6 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.converter.scalars.ScalarsConverterFactory
 import retrofit2.create
 
 object ApiFactory {
@@ -15,6 +16,7 @@ object ApiFactory {
 
     private val retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
+        .addConverterFactory(ScalarsConverterFactory.create())
         .baseUrl("http://10.0.2.2:8080/")
         .client(okHttpClient)
         .build()
