@@ -14,6 +14,9 @@ class NavigationState(
         }
     }
 
+    fun navigateToChat(recipientId: Int) {
+        navHostController.navigate(Screen.Chat.getRouteWithArguments(recipientId))
+    }
 }
 
 @Composable

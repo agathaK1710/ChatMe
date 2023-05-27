@@ -3,6 +3,7 @@ package com.agathakazak.chatme.data.repository
 import com.agathakazak.chatme.data.mapper.UserMapper
 import com.agathakazak.chatme.data.network.ApiService
 import com.agathakazak.chatme.domain.entity.Chat
+import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.MessageRequest
 import com.agathakazak.chatme.domain.entity.Response
 import com.agathakazak.chatme.domain.entity.User
@@ -46,8 +47,12 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun getChatsForUser(userId: Int): List<Chat> {
         return apiService.getChatsForUser(userId).map {
             val companionUser = apiService.getUserById(it.companionId)
-            mapper.mapLChatDtoToModel(it, companionUser)
+            mapper.mapChatDtoToModel(it, companionUser)
         }
+    }
+
+    override suspend fun getChat(senderId: Int, recipientId: Int): List<Message> {
+        return mapper.mapMessageDtoListToModelList(apiService.getChat(senderId, recipientId))
     }
 
     override suspend fun sendMessage(

@@ -87,7 +87,7 @@ class UserMapper @Inject constructor() {
         stubImageColor = userRegister.stubImageColor
     )
 
-    fun mapLChatDtoToModel(chatsDto: ChatDto, companion: UserDto): Chat {
+    fun mapChatDtoToModel(chatsDto: ChatDto, companion: UserDto): Chat {
         return Chat(
             companion = mapUserDtoToModel(companion),
             lastMessage = chatsDto.lastMessage,

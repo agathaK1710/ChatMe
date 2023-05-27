@@ -254,7 +254,7 @@ private fun CheckLoginState(
             }
         }
         is LoginState.Loading -> {
-            CircularProgressIndicator(color = MaterialTheme.colors.secondary)
+            CircularProgressIndicator(color = MaterialTheme.colors.primaryVariant)
         }
         else -> {
 

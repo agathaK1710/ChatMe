@@ -1,6 +1,7 @@
 package com.agathakazak.chatme.data.network
 
 import com.agathakazak.chatme.data.model.ChatDto
+import com.agathakazak.chatme.data.model.MessageDto
 import com.agathakazak.chatme.data.model.MessageRequestDto
 import com.agathakazak.chatme.data.model.ResponseDto
 import com.agathakazak.chatme.data.model.UserDto
@@ -22,7 +23,7 @@ interface ApiService {
     @POST("login")
     suspend fun loginUser(
         @Body userLogin: UserLoginDto
-    ):ResponseDto<String>
+    ): ResponseDto<String>
 
     @GET("me")
     suspend fun getUserByToken(
@@ -44,13 +45,21 @@ interface ApiService {
         @Body message: MessageRequestDto
     ): String
 
-    @GET("chat")
+    @GET("chats")
     suspend fun getChatsForUser(
         @Query(QUERY_SENDER_ID) senderId: Int
     ): List<ChatDto>
-    companion object{
+
+    @GET("chat")
+    suspend fun getChat(
+        @Query(QUERY_SENDER_ID) senderId: Int,
+        @Query(QUERY_RECIPIENT_ID) recipientId: Int
+    ): List<MessageDto>
+
+    companion object {
         private const val QUERY_PHONE_NUMBER = "phoneNumber"
         private const val QUERY_SENDER_ID = "senderId"
+        private const val QUERY_RECIPIENT_ID = "recipientId"
         private const val PATH_ID = "id"
         private const val HEADER_AUTHORIZATION = "Authorization"
     }

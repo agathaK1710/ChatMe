@@ -2,6 +2,7 @@ package com.agathakazak.chatme.presentation.chats
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,14 +30,25 @@ import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.User
 
 @Composable
-fun ChatItem(user: User, message: String, isUnread: Boolean) {
+fun ChatItem(
+    user: User,
+    message: String,
+    isUnread: Boolean,
+    navigateToMessages: (id: Int) -> Unit
+) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navigateToMessages(user.id)
+            },
         backgroundColor = MaterialTheme.colors.background,
         shape = RectangleShape,
     ) {
         Row(
-            modifier = Modifier.padding(8.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (user.imageUrl != null) {
@@ -85,10 +97,10 @@ fun ChatItem(user: User, message: String, isUnread: Boolean) {
                 )
             }
 
-            if(isUnread){
+            if (isUnread) {
                 Box(
                     modifier = Modifier.weight(1f)
-                ){
+                ) {
                     Box(
                         modifier = Modifier
                             .size(8.dp)

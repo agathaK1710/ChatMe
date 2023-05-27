@@ -1,8 +1,10 @@
-package com.agathakazak.chatme.presentation.chats
+package com.agathakazak.chatme.presentation.messages
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -20,49 +23,86 @@ import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.Message
-import com.agathakazak.chatme.domain.entity.MessageRequest
+import com.agathakazak.chatme.presentation.ChatMeApplication
 import com.agathakazak.chatme.presentation.ViewModelFactory
+import com.agathakazak.chatme.ui.theme.Pink300
 
 @Composable
-fun MessagesScreen(viewModelFactory: ViewModelFactory) {
-    val chatViewModel = viewModel<ChatViewModel>(factory = viewModelFactory)
-    val messages = remember { mutableStateListOf<Message>() }
+fun MessagesScreen(
+    recipientId: Int
+) {
+    val component = (LocalContext.current.applicationContext as ChatMeApplication)
+        .component
+        .getMessagesScreenComponentFactory()
+        .create(recipientId)
+
+    val messagesViewModel = viewModel<MessagesViewModel>(factory = component.getViewModelFactory())
+    val screenState =
+        messagesViewModel.messagesScreenState.observeAsState(MessagesScreenState.Initial)
+
+    when (val currentState = screenState.value) {
+        is MessagesScreenState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colors.primaryVariant)
+            }
+        }
+
+        is MessagesScreenState.Messages -> {
+            Messages(messagesViewModel, currentState.chats)
+        }
+
+        else -> {}
+    }
+
+}
+
+@Composable
+private fun Messages(messagesViewModel: MessagesViewModel, messages: List<Message>) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background),
     ) {
         LazyColumn(modifier = Modifier.weight(1f)) {
-            items(items = messages, key = { it.id!!}) {
-                Card(modifier = Modifier
-                    .wrapContentWidth()
-                    .padding(top = 5.dp, bottom = 5.dp), elevation = 10.dp) {
-                    Text(text = it.messageText)
+            items(items = messages, key = { it.id!! }) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Card(
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .padding(top = 5.dp, bottom = 5.dp),
+                        elevation = 10.dp,
+                        backgroundColor = Pink300
+                    ) {
+                        Text(text = it.messageText, modifier = Modifier.padding(10.dp))
+                    }
                 }
             }
         }
-        MessageTextField(chatViewModel)
+        MessageTextField(messagesViewModel)
     }
 }
 
 @Composable
-fun MessageTextField(chatViewModel: ChatViewModel) {
+fun MessageTextField(messagesViewModel: MessagesViewModel) {
     var messageText by rememberSaveable { mutableStateOf("") }
     Row(
         modifier = Modifier

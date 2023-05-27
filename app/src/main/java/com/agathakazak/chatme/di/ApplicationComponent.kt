@@ -10,6 +10,7 @@ import dagger.Component
 interface ApplicationComponent {
 
     fun inject(mainActivity: MainActivity)
+    fun getMessagesScreenComponentFactory(): MessagesScreenComponent.Factory
 
     @Component.Factory
     interface Factory{

@@ -1,10 +1,14 @@
 package com.agathakazak.chatme.presentation.main
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -33,21 +37,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.viewModelFactory
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.agathakazak.chatme.R
-import com.agathakazak.chatme.domain.entity.Chat
-import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.navigation.AppNavGraph
 import com.agathakazak.chatme.navigation.NavigationState
 import com.agathakazak.chatme.navigation.Screen
 import com.agathakazak.chatme.navigation.rememberNavigationState
 import com.agathakazak.chatme.presentation.ViewModelFactory
+import com.agathakazak.chatme.presentation.messages.MessagesScreen
 import com.agathakazak.chatme.presentation.chats.ChatScreen
 import com.agathakazak.chatme.presentation.login.LoginScreen
 import com.agathakazak.chatme.presentation.login.LoginState
@@ -63,7 +65,7 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     val logState = loginViewModel.loginState.observeAsState(LoginState.Initial)
     var menuState by rememberSaveable { mutableStateOf((logState.value == LoginState.IsLogged)) }
     val navigationState = rememberNavigationState()
-    val focusRequester = remember{FocusRequester()}
+    val focusRequester = remember { FocusRequester() }
     val currentDestination =
         navigationState.navHostController.currentBackStackEntryAsState().value?.destination
     val items = listOf(
@@ -82,20 +84,35 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                         )
                     },
                     navigationIcon = {
-                        if (search){
-                          IconButton(onClick = {
-                              search = false
-                              searchText = ""
-                          }) {
-                              Icon(
-                                  Icons.Filled.ArrowBack,
-                                  contentDescription = null,
-                                  modifier = Modifier
-                                      .padding(start = 15.dp)
-                                      .size(25.dp),
-                                  tint = Color.White
-                              )
-                          }
+                        if (currentDestination?.route == Screen.Chat.route) {
+                            menuState = false
+                            IconButton(onClick = {
+                                menuState = true
+                            }) {
+                                Icon(
+                                    Icons.Filled.ArrowBack,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .size(25.dp),
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                        if (search) {
+                            IconButton(onClick = {
+                                search = false
+                                searchText = ""
+                            }) {
+                                Icon(
+                                    Icons.Filled.ArrowBack,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(start = 15.dp)
+                                        .size(25.dp),
+                                    tint = Color.White
+                                )
+                            }
                         } else {
                             IconButton(onClick = { menuState = !menuState }) {
                                 Icon(
@@ -145,8 +162,8 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                                         }
                                     }
                                 )
-                                LaunchedEffect(search){
-                                    if(search) focusRequester.requestFocus()
+                                LaunchedEffect(search) {
+                                    if (search) focusRequester.requestFocus()
                                 }
                             }
                             IconButton(onClick = {
@@ -167,39 +184,57 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     ) { paddingValues ->
         Row(modifier = Modifier.fillMaxSize()) {
             if (menuState) {
-                NavigationRail(
-                    modifier = Modifier.padding(paddingValues)
-                ) {
-                    items.forEach { page ->
-                        val selected = currentDestination?.route?.let { it == page.route } ?: false
-                        NavigationRailItem(
-                            icon = {
-                                Icon(
-                                    painterResource(page.iconId),
-                                    modifier = Modifier.size(25.dp),
-                                    contentDescription = null
-                                )
-                            },
-                            selected = selected,
-                            label = {
-                                Text(
-                                    page.title,
-                                    color = if (selected) MaterialTheme.colors.primaryVariant
-                                    else MaterialTheme.colors.onSecondary
-                                )
-                            },
-                            selectedContentColor = MaterialTheme.colors.primaryVariant,
-                            unselectedContentColor = MaterialTheme.colors.onSecondary,
-                            onClick = {
-                                search = false
-                                searchText = ""
-                                navigationState.navHostController.navigate(page.route)
-                            }
-                        )
-                    }
+                MenuBar(paddingValues, navigationState, items) { page ->
+                    search = false
+                    searchText = ""
+                    navigationState.navHostController.navigate(page.screen.route)
                 }
             }
+            Spacer(modifier = Modifier.size(1.dp))
             NavigationGraph(navigationState, loginViewModel, viewModelFactory, logState)
+        }
+    }
+}
+
+@Composable
+private fun MenuBar(
+    paddingValues: PaddingValues,
+    navigationState: NavigationState,
+    items: List<NavigationRailPages>,
+    onClick: (page: NavigationRailPages) -> Unit
+) {
+    NavigationRail(
+        modifier = Modifier
+            .padding(paddingValues)
+            .wrapContentWidth()
+    ) {
+        val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
+        items.forEach { page ->
+            val selected = navBackStackEntry?.destination?.hierarchy?.any {
+                it.route == page.screen.route
+            } ?: false
+            NavigationRailItem(
+                icon = {
+                    Icon(
+                        painterResource(page.iconId),
+                        modifier = Modifier.size(25.dp),
+                        contentDescription = null
+                    )
+                },
+                selected = selected,
+                label = {
+                    Text(
+                        page.title,
+                        color = if (selected) MaterialTheme.colors.primaryVariant
+                        else MaterialTheme.colors.onSecondary
+                    )
+                },
+                selectedContentColor = MaterialTheme.colors.primaryVariant,
+                unselectedContentColor = MaterialTheme.colors.onSecondary,
+                onClick = {
+                    onClick(page)
+                }
+            )
         }
     }
 }
@@ -237,7 +272,12 @@ private fun NavigationGraph(
             )
         },
         chatsScreenContext = {
-            ChatScreen(viewModelFactory)
+            ChatScreen(viewModelFactory) {
+                navigationState.navigateToChat(it)
+            }
+        },
+        chatScreenContext = {
+            MessagesScreen(it)
         },
         searchScreenContext = {
             SearchScreen(viewModelFactory)
