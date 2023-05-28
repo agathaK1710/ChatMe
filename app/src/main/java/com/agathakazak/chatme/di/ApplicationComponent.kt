@@ -2,6 +2,7 @@ package com.agathakazak.chatme.di
 
 import android.content.Context
 import com.agathakazak.chatme.presentation.MainActivity
+import com.agathakazak.chatme.presentation.ViewModelFactory
 import dagger.BindsInstance
 import dagger.Component
 
@@ -9,7 +10,7 @@ import dagger.Component
 @Component(modules = [DataModule::class, ViewModelsModule::class])
 interface ApplicationComponent {
 
-    fun inject(mainActivity: MainActivity)
+    fun getViewModelFactory(): ViewModelFactory
     fun getMessagesScreenComponentFactory(): MessagesScreenComponent.Factory
 
     @Component.Factory

@@ -1,5 +1,9 @@
 package com.agathakazak.chatme.presentation.main
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.Icon
@@ -34,13 +39,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.agathakazak.chatme.R
@@ -76,124 +84,104 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
             if (logState.value == LoginState.IsLogged) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(id = R.string.app_name),
-                            color = Color.White
-                        )
+                MainTopBar(
+                    currentDestination,
+                    search,
+                    searchText,
+                    focusRequester,
+                    backClick = {
+                        search = false
+                        searchText = ""
                     },
-                    navigationIcon = {
-                        if (currentDestination?.route == Screen.Chat.route) {
-                            menuState = false
-                            IconButton(onClick = {
-                                menuState = true
-                            }) {
-                                Icon(
-                                    Icons.Filled.ArrowBack,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .padding(start = 15.dp)
-                                        .size(25.dp),
-                                    tint = Color.White
-                                )
-                            }
-                        }
-                        if (search) {
-                            IconButton(onClick = {
-                                search = false
-                                searchText = ""
-                            }) {
-                                Icon(
-                                    Icons.Filled.ArrowBack,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .padding(start = 15.dp)
-                                        .size(25.dp),
-                                    tint = Color.White
-                                )
-                            }
-                        } else {
-                            IconButton(onClick = { menuState = !menuState }) {
-                                Icon(
-                                    Icons.Filled.Menu,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .padding(start = 15.dp)
-                                        .size(30.dp),
-                                    tint = Color.White
-                                )
-                            }
-                        }
+                    menuClick = {
+                        menuState = !menuState
                     },
-                    backgroundColor = MaterialTheme.colors.primaryVariant,
-                    actions = {
-                        if (currentDestination?.route == Screen.Search.route) {
-                            if (search) {
-                                TextField(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .focusRequester(focusRequester),
-                                    value = searchText,
-                                    onValueChange = {
-                                        searchText = it
-                                    },
-                                    colors = TextFieldDefaults.textFieldColors(
-                                        backgroundColor = MaterialTheme.colors.primaryVariant,
-                                        textColor = Color.White,
-                                        cursorColor = Color.White
-                                    ),
-                                    placeholder = {
-                                        Text(text = "Search contact", color = Color.White)
-                                    },
-                                    maxLines = 1,
-                                    singleLine = true,
-                                    trailingIcon = {
-                                        if (searchText.isNotBlank()) {
-                                            IconButton(onClick = {
-                                                searchText = ""
-                                            }) {
-                                                Icon(
-                                                    Icons.Filled.Close,
-                                                    null,
-                                                    tint = Color.White
-                                                )
-                                            }
-                                        }
-                                    }
-                                )
-                                LaunchedEffect(search) {
-                                    if (search) focusRequester.requestFocus()
-                                }
-                            }
-                            IconButton(onClick = {
-                                search = true
-                            }) {
-                                Icon(
-                                    imageVector = Icons.Filled.Search,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(25.dp),
-                                    tint = Color.White
-                                )
-                            }
-                        }
+                    searchTextChange = {
+                        searchText = it
+                    },
+                    searchClick = {
+                        search = true
+                    },
+                    chatBack = {
+                        navigationState.navHostController.popBackStack()
+                        menuState = !menuState
                     }
                 )
             }
         }
     ) { paddingValues ->
-        Row(modifier = Modifier.fillMaxSize()) {
-            if (menuState) {
-                MenuBar(paddingValues, navigationState, items) { page ->
-                    search = false
-                    searchText = ""
-                    navigationState.navHostController.navigate(page.screen.route)
+        val size by animateDpAsState(
+            targetValue = if (menuState) 72.dp else 0.dp,
+        )
+        val alfa by animateFloatAsState(targetValue = if (menuState) 1f else 0f)
+        Box(modifier = Modifier.fillMaxSize()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = size)
+            ) {
+                NavigationGraph(navigationState, loginViewModel, viewModelFactory, logState) {
+                    menuState = !menuState
                 }
             }
-            Spacer(modifier = Modifier.size(1.dp))
-            NavigationGraph(navigationState, loginViewModel, viewModelFactory, logState)
+            MenuBar(paddingValues, navigationState, items, size, alfa) { page ->
+                search = false
+                searchText = ""
+                navigationState.navHostController.navigate(page.screen.route)
+            }
         }
     }
+}
+
+@Composable
+private fun NavigationGraph(
+    navigationState: NavigationState,
+    loginViewModel: LoginViewModel,
+    viewModelFactory: ViewModelFactory,
+    logState: State<LoginState>,
+    changeMenuState: () -> Unit
+) {
+    val registrationViewModel: RegistrationViewModel = viewModel(factory = viewModelFactory)
+    AppNavGraph(
+        navHostController = navigationState.navHostController,
+        logState.value,
+        loginScreenContext = {
+            LoginScreen(
+                onClickSignUp = {
+                    navigationState.navigateTo(Screen.Registration.route)
+                },
+                navigateToMainScreen = {
+                    loginViewModel.changeLoginState(LoginState.IsLogged)
+                    navigationState.navigateTo(Screen.Chats.route)
+                },
+                viewModelFactory
+            )
+        },
+        registrationScreenContext = {
+            RegistrationScreen(
+                onClickSignIn = {
+                    registrationViewModel.changeRegistrationState(RegistrationState.IsRegistered)
+                    navigationState.navigateTo(Screen.Login.route)
+                },
+                viewModelFactory
+            )
+        },
+        chatsScreenContext = {
+            ChatScreen(viewModelFactory) {
+                navigationState.navigateToChat(it)
+                changeMenuState()
+            }
+        },
+        chatScreenContext = {
+            MessagesScreen(it)
+        },
+        searchScreenContext = {
+            SearchScreen(viewModelFactory)
+        },
+        settingsScreenContext = {
+            Text(text = "Settings page", modifier = Modifier.fillMaxSize())
+        }
+    )
 }
 
 @Composable
@@ -201,12 +189,15 @@ private fun MenuBar(
     paddingValues: PaddingValues,
     navigationState: NavigationState,
     items: List<NavigationRailPages>,
+    width: Dp = 72.dp,
+    alpha: Float = 1f,
     onClick: (page: NavigationRailPages) -> Unit
 ) {
     NavigationRail(
         modifier = Modifier
             .padding(paddingValues)
-            .wrapContentWidth()
+            .width(width)
+            .alpha(alpha)
     ) {
         val navBackStackEntry by navigationState.navHostController.currentBackStackEntryAsState()
         items.forEach { page ->
@@ -240,50 +231,108 @@ private fun MenuBar(
 }
 
 @Composable
-private fun NavigationGraph(
-    navigationState: NavigationState,
-    loginViewModel: LoginViewModel,
-    viewModelFactory: ViewModelFactory,
-    logState: State<LoginState>
+private fun MainTopBar(
+    currentDestination: NavDestination?,
+    search: Boolean,
+    searchText: String,
+    focusRequester: FocusRequester,
+    backClick: () -> Unit,
+    chatBack: () -> Unit,
+    menuClick: () -> Unit,
+    searchTextChange: (String) -> Unit,
+    searchClick: (Boolean) -> Unit
 ) {
-    val registrationViewModel: RegistrationViewModel = viewModel(factory = viewModelFactory)
-    AppNavGraph(
-        navHostController = navigationState.navHostController,
-        logState.value,
-        loginScreenContext = {
-            LoginScreen(
-                onClickSignUp = {
-                    navigationState.navigateTo(Screen.Registration.route)
-                },
-                navigateToMainScreen = {
-                    loginViewModel.changeLoginState(LoginState.IsLogged)
-                    navigationState.navigateTo(Screen.Chats.route)
-                },
-                viewModelFactory
+    TopAppBar(
+        title = {
+            Text(
+                text = stringResource(id = R.string.app_name),
+                color = Color.White
             )
         },
-        registrationScreenContext = {
-            RegistrationScreen(
-                onClickSignIn = {
-                    registrationViewModel.changeRegistrationState(RegistrationState.IsRegistered)
-                    navigationState.navigateTo(Screen.Login.route)
-                },
-                viewModelFactory
-            )
-        },
-        chatsScreenContext = {
-            ChatScreen(viewModelFactory) {
-                navigationState.navigateToChat(it)
+        navigationIcon = {
+            if (search || currentDestination?.route == Screen.Chat.route) {
+                IconButton(onClick = {
+                    if (currentDestination?.route == Screen.Chat.route) {
+                        chatBack()
+                    } else {
+                        backClick()
+                    }
+                }) {
+                    Icon(
+                        Icons.Filled.ArrowBack,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 15.dp)
+                            .size(25.dp),
+                        tint = Color.White
+                    )
+                }
+            } else {
+                IconButton(onClick = {
+                    menuClick()
+                }) {
+                    Icon(
+                        Icons.Filled.Menu,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .padding(start = 15.dp)
+                            .size(30.dp),
+                        tint = Color.White
+                    )
+                }
             }
         },
-        chatScreenContext = {
-            MessagesScreen(it)
-        },
-        searchScreenContext = {
-            SearchScreen(viewModelFactory)
-        },
-        settingsScreenContext = {
-            Text(text = "Settings page", modifier = Modifier.fillMaxSize())
+        backgroundColor = MaterialTheme.colors.primaryVariant,
+        actions = {
+            if (currentDestination?.route == Screen.Search.route) {
+                if (search) {
+                    TextField(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(focusRequester),
+                        value = searchText,
+                        onValueChange = {
+                            searchTextChange(it)
+                        },
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = MaterialTheme.colors.primaryVariant,
+                            textColor = Color.White,
+                            cursorColor = Color.White
+                        ),
+                        placeholder = {
+                            Text(text = "Search contact", color = Color.White)
+                        },
+                        maxLines = 1,
+                        singleLine = true,
+                        trailingIcon = {
+                            if (searchText.isNotBlank()) {
+                                IconButton(onClick = {
+                                    searchTextChange("")
+                                }) {
+                                    Icon(
+                                        Icons.Filled.Close,
+                                        null,
+                                        tint = Color.White
+                                    )
+                                }
+                            }
+                        }
+                    )
+                    LaunchedEffect(search) {
+                        if (search) focusRequester.requestFocus()
+                    }
+                }
+                IconButton(onClick = {
+                    searchClick(true)
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = null,
+                        modifier = Modifier.size(25.dp),
+                        tint = Color.White
+                    )
+                }
+            }
         }
     )
 }

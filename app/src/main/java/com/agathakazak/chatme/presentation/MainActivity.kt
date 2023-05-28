@@ -8,19 +8,12 @@ import com.agathakazak.chatme.ui.theme.ChatMeTheme
 import javax.inject.Inject
 
 class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var viewModelFactory: ViewModelFactory
-
-    private val component by lazy {
-        (application as ChatMeApplication).component
-    }
     override fun onCreate(savedInstanceState: Bundle?) {
-        component.inject(this)
         super.onCreate(savedInstanceState)
         setContent {
             ChatMeTheme {
-               MainScreen(viewModelFactory)
+                val component = getApplicationComponent()
+                MainScreen(component.getViewModelFactory())
             }
         }
     }

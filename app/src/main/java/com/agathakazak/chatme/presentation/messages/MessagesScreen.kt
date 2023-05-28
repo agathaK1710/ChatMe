@@ -22,6 +22,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -40,14 +41,14 @@ import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.presentation.ChatMeApplication
 import com.agathakazak.chatme.presentation.ViewModelFactory
+import com.agathakazak.chatme.presentation.getApplicationComponent
 import com.agathakazak.chatme.ui.theme.Pink300
 
 @Composable
 fun MessagesScreen(
     recipientId: Int
 ) {
-    val component = (LocalContext.current.applicationContext as ChatMeApplication)
-        .component
+    val component = getApplicationComponent()
         .getMessagesScreenComponentFactory()
         .create(recipientId)
 
@@ -55,6 +56,14 @@ fun MessagesScreen(
     val screenState =
         messagesViewModel.messagesScreenState.observeAsState(MessagesScreenState.Initial)
 
+    MessagesScreenContent(screenState, messagesViewModel)
+}
+
+@Composable
+private fun MessagesScreenContent(
+    screenState: State<MessagesScreenState>,
+    messagesViewModel: MessagesViewModel
+) {
     when (val currentState = screenState.value) {
         is MessagesScreenState.Loading -> {
             Box(
@@ -71,7 +80,6 @@ fun MessagesScreen(
 
         else -> {}
     }
-
 }
 
 @Composable
