@@ -43,7 +43,7 @@ interface ApiService {
     @POST("message")
     suspend fun sendMessage(
         @Body message: MessageRequestDto
-    ): String
+    )
 
     @GET("chats")
     suspend fun getChatsForUser(

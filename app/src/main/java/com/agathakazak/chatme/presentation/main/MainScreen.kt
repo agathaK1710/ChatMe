@@ -121,7 +121,7 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                     .padding(start = size)
             ) {
                 NavigationGraph(navigationState, loginViewModel, viewModelFactory, logState) {
-                    menuState = !menuState
+                    menuState = false
                 }
             }
             MenuBar(paddingValues, navigationState, items, size, alfa) { page ->

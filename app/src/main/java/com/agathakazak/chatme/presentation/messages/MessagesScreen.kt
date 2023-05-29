@@ -1,5 +1,6 @@
 package com.agathakazak.chatme.presentation.messages
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -22,27 +24,28 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.Message
-import com.agathakazak.chatme.presentation.ChatMeApplication
-import com.agathakazak.chatme.presentation.ViewModelFactory
 import com.agathakazak.chatme.presentation.getApplicationComponent
-import com.agathakazak.chatme.ui.theme.Pink300
+import kotlinx.coroutines.launch
 
 @Composable
 fun MessagesScreen(
@@ -75,7 +78,8 @@ private fun MessagesScreenContent(
         }
 
         is MessagesScreenState.Messages -> {
-            Messages(messagesViewModel, currentState.chats)
+            messagesViewModel.loadMessages()
+            Messages(messagesViewModel, currentState.messages)
         }
 
         else -> {}
@@ -83,26 +87,46 @@ private fun MessagesScreenContent(
 }
 
 @Composable
-private fun Messages(messagesViewModel: MessagesViewModel, messages: List<Message>) {
+private fun Messages(messagesViewModel: MessagesViewModel, messages: SnapshotStateList<Message>) {
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background),
     ) {
-        LazyColumn(modifier = Modifier.weight(1f)) {
+        LazyColumn(
+            modifier = Modifier
+                .weight(1f)
+                .padding(top = 8.dp),
+            state = listState
+        ) {
             items(items = messages, key = { it.id!! }) {
                 Row(modifier = Modifier.fillMaxWidth()) {
-                    Spacer(modifier = Modifier.weight(1f))
+                    if (it.recipientId == messagesViewModel.recipientId) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
                     Card(
                         modifier = Modifier
                             .wrapContentWidth()
-                            .padding(top = 5.dp, bottom = 5.dp),
-                        elevation = 10.dp,
-                        backgroundColor = Pink300
+                            .padding(2.dp),
+                        elevation = 5.dp,
+                        backgroundColor = MaterialTheme.colors.onBackground.copy(0.6f)
+                            .compositeOver(MaterialTheme.colors.background)
                     ) {
-                        Text(text = it.messageText, modifier = Modifier.padding(10.dp))
+                        Text(
+                            text = it.messageText,
+                            modifier = Modifier
+                                .padding(10.dp),
+                            color = MaterialTheme.colors.onPrimary
+                        )
                     }
                 }
+            }
+        }
+        LaunchedEffect(messages.size){
+            coroutineScope.launch {
+                listState.animateScrollToItem(messages.lastIndex)
             }
         }
         MessageTextField(messagesViewModel)
@@ -120,9 +144,9 @@ fun MessageTextField(messagesViewModel: MessagesViewModel) {
             .drawBehind {
                 drawLine(
                     Color(0xFF9B9999),
-                    Offset(0f, -density / 2),
-                    Offset(size.width, -density / 2),
-                    density / 2
+                    Offset(0f, -density / 3),
+                    Offset(size.width, -density / 3),
+                    density / 3
                 )
             },
         verticalAlignment = Alignment.CenterVertically
@@ -172,11 +196,7 @@ fun MessageTextField(messagesViewModel: MessagesViewModel) {
             }
         } else {
             IconButton(onClick = {
-//                chatViewModel.sendMessage(
-//                    MessageRequest(
-//
-//                    )
-//                )
+                messagesViewModel.sendMessage(messageText)
                 messageText = ""
             }) {
                 Icon(

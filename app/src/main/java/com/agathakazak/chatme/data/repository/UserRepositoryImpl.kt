@@ -57,7 +57,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun sendMessage(
         messageRequest: MessageRequest
-    ): String {
+    ) {
         return apiService.sendMessage(
             mapper.mapMessageRequestModelToDto(messageRequest)
         )

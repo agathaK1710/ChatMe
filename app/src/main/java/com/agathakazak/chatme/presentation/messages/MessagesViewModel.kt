@@ -1,15 +1,20 @@
 package com.agathakazak.chatme.presentation.messages
 
 import android.content.SharedPreferences
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.agathakazak.chatme.domain.entity.Message
+import com.agathakazak.chatme.domain.entity.MessageRequest
 import com.agathakazak.chatme.domain.usecase.GetChatUseCase
 import com.agathakazak.chatme.domain.usecase.GetUserByTokenUseCase
 import com.agathakazak.chatme.domain.usecase.SendMessageUseCase
+import com.google.gson.Gson
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class MessagesViewModel @Inject constructor(
@@ -17,7 +22,7 @@ class MessagesViewModel @Inject constructor(
     private val getChatUseCase: GetChatUseCase,
     private val sendMessage: SendMessageUseCase,
     private val sharedPreferences: SharedPreferences,
-    private val recipientId: Int
+    val recipientId: Int
 
 ) : ViewModel() {
 
@@ -25,18 +30,21 @@ class MessagesViewModel @Inject constructor(
         MutableLiveData<MessagesScreenState>(MessagesScreenState.Initial)
     val messagesScreenState: LiveData<MessagesScreenState> = _messagesScreenState
 
+
     init {
         _messagesScreenState.value = MessagesScreenState.Loading
         loadMessages()
     }
 
-    private fun loadMessages() {
+    fun loadMessages() {
         val sender = viewModelScope.async {
             getUserByTokenUseCase("Bearer " + getToken()!!)
         }
         viewModelScope.launch {
+            val messages = mutableStateListOf<Message>()
+            messages.addAll(getChatUseCase(sender.await().id, recipientId))
             _messagesScreenState.value =
-                MessagesScreenState.Messages(getChatUseCase(sender.await().id, recipientId))
+                MessagesScreenState.Messages(messages)
         }
     }
 
@@ -49,25 +57,24 @@ class MessagesViewModel @Inject constructor(
     }
 
 
-//
-//    fun sendMessage(messageText: String, attachmentId: Int? = null, recipientId: Int) {
-//        val sender = viewModelScope.async {
-//            getUserByTokenUseCase("Bearer " + getToken()!!)
-//        }
-//        viewModelScope.launch {
-//            val messageRequest = MessageRequest(
-//                senderId = sender.await().id,
-//                recipientId,
-//                messageText,
-//                attachmentId
-//            )
-//            try {
-//                sendMessage(messageRequest)
-//            } catch (e: HttpException) {
-//                val responseString = e.response()?.errorBody()?.string()
-//                val gson = Gson()
-//                val response = gson.fromJson(responseString, String::class.java)
-//            }
-//        }
-//    }
+    fun sendMessage(messageText: String, attachmentId: Int? = null) {
+        val sender = viewModelScope.async {
+            getUserByTokenUseCase("Bearer " + getToken()!!)
+        }
+        viewModelScope.launch {
+            val messageRequest = MessageRequest(
+                senderId = sender.await().id,
+                recipientId,
+                messageText,
+                attachmentId
+            )
+            try {
+                sendMessage(messageRequest)
+            } catch (e: HttpException) {
+                val responseString = e.response()?.errorBody()?.string()
+                val gson = Gson()
+                val response = gson.fromJson(responseString, String::class.java)
+            }
+        }
+    }
 }
