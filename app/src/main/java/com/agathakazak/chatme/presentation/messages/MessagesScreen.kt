@@ -1,8 +1,6 @@
 package com.agathakazak.chatme.presentation.messages
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,12 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.Message
+import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.presentation.getApplicationComponent
 import kotlinx.coroutines.launch
 
 @Composable
 fun MessagesScreen(
-    recipientId: Int
+    recipientId: Int,
+    setUser: (User) -> Unit
 ) {
     val component = getApplicationComponent()
         .getMessagesScreenComponentFactory()
@@ -59,14 +59,16 @@ fun MessagesScreen(
     val messagesViewModel = viewModel<MessagesViewModel>(factory = component.getViewModelFactory())
     val screenState =
         messagesViewModel.messagesScreenState.observeAsState(MessagesScreenState.Initial)
-
-    MessagesScreenContent(screenState, messagesViewModel)
+    MessagesScreenContent(screenState, messagesViewModel){
+        setUser(it)
+    }
 }
 
 @Composable
 private fun MessagesScreenContent(
     screenState: State<MessagesScreenState>,
-    messagesViewModel: MessagesViewModel
+    messagesViewModel: MessagesViewModel,
+    setUser: (User) -> Unit
 ) {
     when (val currentState = screenState.value) {
         is MessagesScreenState.Loading -> {
@@ -81,20 +83,21 @@ private fun MessagesScreenContent(
         is MessagesScreenState.Messages -> {
             messagesViewModel.loadMessages()
             Messages(messagesViewModel, currentState.messages)
+            setUser(currentState.recipient)
         }
 
         else -> {}
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+
 @Composable
 private fun Messages(
     messagesViewModel: MessagesViewModel,
-    messages: SnapshotStateList<Message>
-) {
+    messages: SnapshotStateList<Message>) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -139,6 +142,7 @@ private fun Messages(
         }
         MessageTextField(messagesViewModel)
     }
+
 }
 
 @Composable

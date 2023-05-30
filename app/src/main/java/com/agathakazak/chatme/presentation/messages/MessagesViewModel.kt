@@ -2,6 +2,7 @@ package com.agathakazak.chatme.presentation.messages
 
 import android.content.SharedPreferences
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -10,6 +11,7 @@ import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.MessageRequest
 import com.agathakazak.chatme.domain.usecase.DeleteMessageUseCase
 import com.agathakazak.chatme.domain.usecase.GetChatUseCase
+import com.agathakazak.chatme.domain.usecase.GetUserByIdUseCase
 import com.agathakazak.chatme.domain.usecase.GetUserByTokenUseCase
 import com.agathakazak.chatme.domain.usecase.SendMessageUseCase
 import com.google.gson.Gson
@@ -21,6 +23,7 @@ import javax.inject.Inject
 class MessagesViewModel @Inject constructor(
     private val getUserByTokenUseCase: GetUserByTokenUseCase,
     private val getChatUseCase: GetChatUseCase,
+    private val getUserByIdUseCase: GetUserByIdUseCase,
     private val sendMessage: SendMessageUseCase,
     private val sharedPreferences: SharedPreferences,
     private val deleteMessageUseCase: DeleteMessageUseCase,
@@ -46,7 +49,7 @@ class MessagesViewModel @Inject constructor(
             val messages = mutableStateListOf<Message>()
             messages.addAll(getChatUseCase(sender.await().id, recipientId))
             _messagesScreenState.value =
-                MessagesScreenState.Messages(messages)
+                MessagesScreenState.Messages(messages, getUserByIdUseCase(recipientId))
         }
     }
 

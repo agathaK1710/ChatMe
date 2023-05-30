@@ -2,10 +2,12 @@ package com.agathakazak.chatme.presentation.chats
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -14,9 +16,13 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.presentation.ViewModelFactory
 
 @Composable
-fun ChatScreen(viewModelFactory: ViewModelFactory, navigateToMessages: (id: Int) -> Unit) {
+fun ChatScreen(
+    viewModelFactory: ViewModelFactory,
+    navigateToMessages: (id: Int) -> Unit
+) {
     val chatViewModel = viewModel<ChatsViewModel>(factory = viewModelFactory)
     val screenState = chatViewModel.chatScreenState.observeAsState(AllChatScreenState.Initial)
+
     when (val currentState = screenState.value) {
         is AllChatScreenState.Chats -> {
             LazyColumn {
@@ -25,6 +31,7 @@ fun ChatScreen(viewModelFactory: ViewModelFactory, navigateToMessages: (id: Int)
                 }
             }
         }
+
         is AllChatScreenState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -33,6 +40,7 @@ fun ChatScreen(viewModelFactory: ViewModelFactory, navigateToMessages: (id: Int)
                 CircularProgressIndicator(color = MaterialTheme.colors.primaryVariant)
             }
         }
+
         else -> {}
     }
 }
