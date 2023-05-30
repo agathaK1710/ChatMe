@@ -62,4 +62,8 @@ class UserRepositoryImpl @Inject constructor(
             mapper.mapMessageRequestModelToDto(messageRequest)
         )
     }
+
+    override suspend fun deleteMessage(id: Int) {
+        apiService.deleteMessage(id)
+    }
 }

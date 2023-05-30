@@ -17,4 +17,5 @@ interface UserRepository {
     suspend fun getChatsForUser(userId: Int): List<Chat>
     suspend fun getChat(senderId: Int, recipientId: Int): List<Message>
     suspend fun sendMessage(messageRequest: MessageRequest)
+    suspend fun deleteMessage(id: Int)
 }

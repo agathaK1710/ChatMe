@@ -8,6 +8,7 @@ import com.agathakazak.chatme.data.model.UserDto
 import com.agathakazak.chatme.data.model.UserLoginDto
 import com.agathakazak.chatme.data.model.UserRegisterDto
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
@@ -43,6 +44,11 @@ interface ApiService {
     @POST("message")
     suspend fun sendMessage(
         @Body message: MessageRequestDto
+    )
+
+    @DELETE("message")
+    suspend fun deleteMessage(
+        @Path(PATH_ID) messageId: Int
     )
 
     @GET("chats")

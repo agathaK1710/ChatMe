@@ -1,7 +1,8 @@
 package com.agathakazak.chatme.presentation.messages
 
-import android.util.Log
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -86,8 +87,12 @@ private fun MessagesScreenContent(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun Messages(messagesViewModel: MessagesViewModel, messages: SnapshotStateList<Message>) {
+private fun Messages(
+    messagesViewModel: MessagesViewModel,
+    messages: SnapshotStateList<Message>
+) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     Column(
@@ -102,7 +107,10 @@ private fun Messages(messagesViewModel: MessagesViewModel, messages: SnapshotSta
             state = listState
         ) {
             items(items = messages, key = { it.id!! }) {
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     if (it.recipientId == messagesViewModel.recipientId) {
                         Spacer(modifier = Modifier.weight(1f))
                     }
@@ -124,7 +132,7 @@ private fun Messages(messagesViewModel: MessagesViewModel, messages: SnapshotSta
                 }
             }
         }
-        LaunchedEffect(messages.size){
+        LaunchedEffect(messages.size) {
             coroutineScope.launch {
                 listState.animateScrollToItem(messages.lastIndex)
             }

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.MessageRequest
+import com.agathakazak.chatme.domain.usecase.DeleteMessageUseCase
 import com.agathakazak.chatme.domain.usecase.GetChatUseCase
 import com.agathakazak.chatme.domain.usecase.GetUserByTokenUseCase
 import com.agathakazak.chatme.domain.usecase.SendMessageUseCase
@@ -22,6 +23,7 @@ class MessagesViewModel @Inject constructor(
     private val getChatUseCase: GetChatUseCase,
     private val sendMessage: SendMessageUseCase,
     private val sharedPreferences: SharedPreferences,
+    private val deleteMessageUseCase: DeleteMessageUseCase,
     val recipientId: Int
 
 ) : ViewModel() {
@@ -45,6 +47,12 @@ class MessagesViewModel @Inject constructor(
             messages.addAll(getChatUseCase(sender.await().id, recipientId))
             _messagesScreenState.value =
                 MessagesScreenState.Messages(messages)
+        }
+    }
+
+    fun deleteMessage(id: Int){
+        viewModelScope.launch {
+            deleteMessageUseCase(id)
         }
     }
 
