@@ -9,4 +9,5 @@ data class Message(
     val date: Long,
     val attachmentId: Int? = null,
     val isUnread: Boolean,
+    var isSelected: Boolean = false
 )

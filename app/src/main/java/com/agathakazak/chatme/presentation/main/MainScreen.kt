@@ -2,33 +2,18 @@ package com.agathakazak.chatme.presentation.main
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.NavigationRail
 import androidx.compose.material.NavigationRailItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -36,27 +21,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import coil.compose.AsyncImage
-import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.navigation.AppNavGraph
 import com.agathakazak.chatme.navigation.NavigationState
@@ -65,14 +39,11 @@ import com.agathakazak.chatme.navigation.rememberNavigationState
 import com.agathakazak.chatme.presentation.ViewModelFactory
 import com.agathakazak.chatme.presentation.chats.ChatScreen
 import com.agathakazak.chatme.presentation.chats.ChatTopBar
-import com.agathakazak.chatme.presentation.getApplicationComponent
 import com.agathakazak.chatme.presentation.login.LoginScreen
 import com.agathakazak.chatme.presentation.login.LoginState
 import com.agathakazak.chatme.presentation.login.LoginViewModel
 import com.agathakazak.chatme.presentation.messages.MessagesScreen
-import com.agathakazak.chatme.presentation.messages.MessagesScreenState
 import com.agathakazak.chatme.presentation.messages.MessagesTopBar
-import com.agathakazak.chatme.presentation.messages.MessagesViewModel
 import com.agathakazak.chatme.presentation.registration.RegistrationScreen
 import com.agathakazak.chatme.presentation.registration.RegistrationState
 import com.agathakazak.chatme.presentation.registration.RegistrationViewModel
@@ -94,7 +65,7 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     var search by rememberSaveable { mutableStateOf(false) }
     var searchText by rememberSaveable { mutableStateOf("") }
     var user by rememberSaveable { mutableStateOf<User?>(null) }
-
+    var longClick by rememberSaveable { mutableStateOf(false) }
     val size by animateDpAsState(
         targetValue = if (menuState) 72.dp else 0.dp,
     )
@@ -108,9 +79,16 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                 },
                 search,
                 searchText,
+                changeSearchState = {
+                    search = it
+                },
+                changeSearchText = {
+                    searchText = it
+                },
                 focusRequester,
                 navigationState,
-                user
+                user,
+                longClick
             )
         }
     ) {
@@ -131,10 +109,14 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                     logState,
                     changeMenuState = {
                         menuState = false
+                    },
+                    setUser = {
+                        user = it
+                    },
+                    setOnLongClick = {
+                        longClick = it
                     }
-                ) {
-                    user = it
-                }
+                )
             }
             MenuBar(navigationState, items, size, alpha) { page ->
                 search = false
@@ -145,44 +127,49 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     }
 }
 
+
 @Composable
 private fun MainTopBar(
     currentDestination: NavDestination?,
     menuClick: () -> Unit,
     search: Boolean,
     searchText: String,
+    changeSearchState: (Boolean) -> Unit,
+    changeSearchText: (String) -> Unit,
     focusRequester: FocusRequester,
     navigationState: NavigationState,
-    user: User?
+    user: User?,
+    longClick: Boolean
 ) {
-    var search1 = search
-    var searchText1 = searchText
     when (currentDestination?.route) {
-
         Screen.Search.route -> {
             SearchTopBar(
-                searchPressed = search1,
-                searchText = searchText1,
+                searchPressed = search,
+                searchText = searchText,
                 focusRequester = focusRequester,
                 backClick = {
-                    search1 = false
-                    searchText1 = ""
+                    changeSearchState(false)
+                    changeSearchText("")
                 },
                 menuClick = { menuClick() },
-                searchTextChange = { searchText1 = it },
-                searchClick = { search1 = true }
+                searchTextChange = {
+                    changeSearchText(it)
+                },
+                searchClick = { changeSearchState(true) }
             )
         }
 
         Screen.Chat.route -> {
-            if (user != null) {
-                MessagesTopBar(user) {
-                    navigationState.navHostController.popBackStack()
-                    menuClick()
-                }
-            } else {
-                ChatTopBar {
-                    menuClick()
+            if (!longClick) {
+                if (user != null) {
+                    MessagesTopBar(user) {
+                        navigationState.navHostController.popBackStack()
+                        menuClick()
+                    }
+                } else {
+                    ChatTopBar {
+                        menuClick()
+                    }
                 }
             }
         }
@@ -202,7 +189,8 @@ private fun NavigationGraph(
     viewModelFactory: ViewModelFactory,
     logState: State<LoginState>,
     changeMenuState: () -> Unit,
-    setUser: (User) -> Unit
+    setUser: (User) -> Unit,
+    setOnLongClick: (Boolean) -> Unit
 ) {
     val registrationViewModel: RegistrationViewModel = viewModel(factory = viewModelFactory)
     AppNavGraph(
@@ -236,11 +224,17 @@ private fun NavigationGraph(
             }
         },
         chatScreenContext = {
-            MessagesScreen(it) { user ->
-                setUser(
-                    user
-                )
-            }
+            MessagesScreen(
+                it,
+                setUser = { user ->
+                    setUser(
+                        user
+                    )
+                },
+                setOnLongClick = {
+                    setOnLongClick(it)
+                }
+            )
         },
         searchScreenContext = {
             SearchScreen(viewModelFactory)
