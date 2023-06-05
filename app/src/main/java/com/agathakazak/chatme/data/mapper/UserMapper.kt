@@ -1,6 +1,7 @@
 package com.agathakazak.chatme.data.mapper
 
 import com.agathakazak.chatme.data.model.ChatDto
+import com.agathakazak.chatme.data.model.IdsListDto
 import com.agathakazak.chatme.data.model.MessageDto
 import com.agathakazak.chatme.data.model.MessageRequestDto
 import com.agathakazak.chatme.data.model.ResponseDto
@@ -76,6 +77,8 @@ class UserMapper @Inject constructor() {
         messageText = messageRequest.messageText,
         attachmentId = messageRequest.attachmentId
     )
+
+    fun mapIdsListToDto(ids: List<Int>) = IdsListDto(ids)
 
     fun mapUserRegisterModelToDto(userRegister: UserRegister) = UserRegisterDto(
         firstName = userRegister.firstName,

@@ -1,6 +1,7 @@
 package com.agathakazak.chatme.data.network
 
 import com.agathakazak.chatme.data.model.ChatDto
+import com.agathakazak.chatme.data.model.IdsListDto
 import com.agathakazak.chatme.data.model.MessageDto
 import com.agathakazak.chatme.data.model.MessageRequestDto
 import com.agathakazak.chatme.data.model.ResponseDto
@@ -10,6 +11,7 @@ import com.agathakazak.chatme.data.model.UserRegisterDto
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -46,9 +48,9 @@ interface ApiService {
         @Body message: MessageRequestDto
     )
 
-    @DELETE("message")
-    suspend fun deleteMessage(
-        @Path(PATH_ID) messageId: Int
+    @HTTP(method = "DELETE", path = "messages", hasBody = true)
+    suspend fun deleteMessages(
+        @Body messageIds: IdsListDto
     )
 
     @GET("chats")

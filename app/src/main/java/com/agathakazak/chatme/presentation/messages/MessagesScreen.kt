@@ -1,12 +1,12 @@
 package com.agathakazak.chatme.presentation.messages
 
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
@@ -27,6 +28,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -46,6 +48,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
@@ -128,6 +131,7 @@ private fun Messages(
     var selectedNum by rememberSaveable {
         mutableStateOf(0)
     }
+    var isDialogOpened by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -137,20 +141,30 @@ private fun Messages(
                     closeClick = {
                         onLongClickState = false
                         setOnLongClick(false)
+                    },
+                    deleteClick = {
+                        isDialogOpened = true
                     }
                 )
             }
         }
     ) {
+        if (isDialogOpened) {
+            Dialog(selectedNum, messagesViewModel){ openState ->
+                isDialogOpened = openState
+            }
+        }
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(it)
                 .background(MaterialTheme.colors.background),
         ) {
+            Spacer(modifier = Modifier.fillMaxWidth().weight(1f))
             LazyColumn(
                 modifier = Modifier
-                    .weight(1f)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
                     .padding(top = 8.dp),
                 state = listState
             ) {
@@ -161,6 +175,11 @@ private fun Messages(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .animateItemPlacement(
+                                animationSpec = tween(
+                                    durationMillis = 1000
+                                )
+                            )
                     ) {
                         if (onLongClickState) {
                             selected = message.isSelected
@@ -168,8 +187,9 @@ private fun Messages(
                                 modifier = Modifier.scale(alpha),
                                 checked = selected,
                                 onCheckedChange = {
-                                    messagesViewModel.selectMessage(index, it)
+                                    messagesViewModel.changeSelectedStatus(index, it)
                                     selected = message.isSelected
+                                    selectedNum = messagesViewModel.getSelectedMessages().size
                                 },
                                 colors = CheckboxDefaults.colors(
                                     checkedColor = MaterialTheme.colors.primaryVariant,
@@ -180,35 +200,34 @@ private fun Messages(
                         if (message.recipientId == messagesViewModel.recipientId) {
                             Spacer(modifier = Modifier.weight(1f))
                         }
-                        if (messagesViewModel.getSelectedNum() == 0) {
+                        if (messagesViewModel.getSelectedMessages().isEmpty()) {
                             onLongClickState = false
                         }
-
                         Card(
                             modifier = Modifier
                                 .wrapContentWidth()
                                 .padding(2.dp)
                                 .combinedClickable(
                                     onClick = {
-                                        messagesViewModel.selectMessage(
+                                        messagesViewModel.changeSelectedStatus(
                                             index,
                                             !message.isSelected
                                         )
                                         selected = message.isSelected
-                                        selectedNum = messagesViewModel.getSelectedNum()
+                                        selectedNum = messagesViewModel.getSelectedMessages().size
                                     },
                                     onLongClick = {
                                         messagesViewModel.unselectAllMessages()
                                         onLongClickState = !onLongClickState
-                                        messagesViewModel.selectMessage(
+                                        messagesViewModel.changeSelectedStatus(
                                             index,
                                             !message.isSelected
                                         )
                                         selected = message.isSelected
-                                        selectedNum = messagesViewModel.getSelectedNum()
+                                        selectedNum = messagesViewModel.getSelectedMessages().size
                                     },
                                 ),
-                            elevation = 5.dp,
+                            elevation = 2.dp,
                             backgroundColor = MaterialTheme.colors.onBackground.copy(0.6f)
                                 .compositeOver(MaterialTheme.colors.background)
                         ) {
@@ -236,11 +255,57 @@ private fun Messages(
 }
 
 @Composable
+private fun Dialog(
+    selectedNum: Int,
+    messagesViewModel: MessagesViewModel,
+    changeOpenState: (Boolean) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = {
+            changeOpenState(false)
+        },
+        title = {
+            Text(
+                text = if (selectedNum == 1) stringResource(R.string.delete_message) else
+                    "Delete $selectedNum messages",
+                color = MaterialTheme.colors.onPrimary
+            )
+        },
+        text = {
+            Text(
+                if (selectedNum == 1) stringResource(R.string.delete_question) else
+                    stringResource(R.string.delete_several_question),
+                color = MaterialTheme.colors.onPrimary
+            )
+        },
+        buttons = {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Spacer(modifier = Modifier.weight(1f))
+                TextButton(
+                    onClick = { changeOpenState(false) }
+                ) {
+                    Text(stringResource(R.string.cancel), color = MaterialTheme.colors.onPrimary)
+                }
+                TextButton(
+                    onClick = {
+                        messagesViewModel.deleteSelectedMessages()
+                        changeOpenState(false)
+                    }
+                ) {
+                    Text(stringResource(R.string.delete), color = Color.Red)
+                }
+            }
+        }
+    )
+}
+
+@Composable
 fun MessageTextField(messagesViewModel: MessagesViewModel) {
     var messageText by rememberSaveable { mutableStateOf("") }
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .padding(top = 10.dp)
             .wrapContentHeight()
             .background(MaterialTheme.colors.background)
             .drawBehind {

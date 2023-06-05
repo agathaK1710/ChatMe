@@ -72,24 +72,26 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     val alpha by animateFloatAsState(targetValue = if (menuState) 1f else 0f)
     Scaffold(
         topBar = {
-            MainTopBar(
-                currentDestination,
-                menuClick = {
-                    menuState = !menuState
-                },
-                search,
-                searchText,
-                changeSearchState = {
-                    search = it
-                },
-                changeSearchText = {
-                    searchText = it
-                },
-                focusRequester,
-                navigationState,
-                user,
-                longClick
-            )
+            if(logState.value == LoginState.IsLogged) {
+                MainTopBar(
+                    currentDestination,
+                    menuClick = {
+                        menuState = !menuState
+                    },
+                    search,
+                    searchText,
+                    changeSearchState = {
+                        search = it
+                    },
+                    changeSearchText = {
+                        searchText = it
+                    },
+                    focusRequester,
+                    navigationState,
+                    user,
+                    longClick
+                )
+            }
         }
     ) {
         Box(

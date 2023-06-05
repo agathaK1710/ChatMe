@@ -30,4 +30,9 @@
     <string name="no_account_question">Don\'t have an account?</string>
     <string name="account_question">Already have an account?</string>
     <string name="icn_search_back_content_description">come back\n</string>
+    <string name="delete_message">Delete message</string>
+    <string name="delete_question">Are you sure you want to delete this message?</string>
+    <string name="delete_several_question">Are you sure you want to delete these messages?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 </resources>
