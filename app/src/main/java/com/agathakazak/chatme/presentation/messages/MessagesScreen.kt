@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -37,11 +38,13 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -49,13 +52,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.presentation.getApplicationComponent
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 
 @Composable
 fun MessagesScreen(
@@ -122,7 +130,6 @@ private fun Messages(
     setOnLongClick: (Boolean) -> Unit
 ) {
     val listState = rememberLazyListState()
-    val coroutineScope = rememberCoroutineScope()
     var onLongClickState by rememberSaveable { mutableStateOf(false) }
     setOnLongClick(onLongClickState)
     val alpha by animateFloatAsState(
@@ -132,7 +139,7 @@ private fun Messages(
         mutableStateOf(0)
     }
     var isDialogOpened by rememberSaveable { mutableStateOf(false) }
-
+    var lastDate by rememberSaveable { mutableStateOf("") }
     Scaffold(
         topBar = {
             if (onLongClickState) {
@@ -150,7 +157,7 @@ private fun Messages(
         }
     ) {
         if (isDialogOpened) {
-            Dialog(selectedNum, messagesViewModel){ openState ->
+            Dialog(selectedNum, messagesViewModel) { openState ->
                 isDialogOpened = openState
             }
         }
@@ -160,15 +167,27 @@ private fun Messages(
                 .padding(it)
                 .background(MaterialTheme.colors.background),
         ) {
-            Spacer(modifier = Modifier.fillMaxWidth().weight(1f))
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
+                    .weight(1f)
                     .padding(top = 8.dp),
                 state = listState
             ) {
                 itemsIndexed(items = messages) { index, message ->
+                    lastDate = if (index != 0) {
+                        getDayFromDate(messages[index - 1].date)
+                    } else {
+                        ""
+                    }
+                    if (lastDate != getDayFromDate(message.date)) {
+                        Text(
+                            modifier = Modifier
+                                .fillMaxWidth(),
+                            text = getDayFromDate(message.date),
+                            color = MaterialTheme.colors.primaryVariant,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                     var selected by rememberSaveable {
                         mutableStateOf(message.isSelected)
                     }
@@ -177,7 +196,7 @@ private fun Messages(
                             .fillMaxWidth()
                             .animateItemPlacement(
                                 animationSpec = tween(
-                                    durationMillis = 1000
+                                    durationMillis = 300
                                 )
                             )
                     ) {
@@ -206,7 +225,7 @@ private fun Messages(
                         Card(
                             modifier = Modifier
                                 .wrapContentWidth()
-                                .padding(2.dp)
+                                .padding(3.dp)
                                 .combinedClickable(
                                     onClick = {
                                         messagesViewModel.changeSelectedStatus(
@@ -214,7 +233,8 @@ private fun Messages(
                                             !message.isSelected
                                         )
                                         selected = message.isSelected
-                                        selectedNum = messagesViewModel.getSelectedMessages().size
+                                        selectedNum =
+                                            messagesViewModel.getSelectedMessages().size
                                     },
                                     onLongClick = {
                                         messagesViewModel.unselectAllMessages()
@@ -224,34 +244,58 @@ private fun Messages(
                                             !message.isSelected
                                         )
                                         selected = message.isSelected
-                                        selectedNum = messagesViewModel.getSelectedMessages().size
+                                        selectedNum =
+                                            messagesViewModel.getSelectedMessages().size
                                     },
                                 ),
                             elevation = 2.dp,
                             backgroundColor = MaterialTheme.colors.onBackground.copy(0.6f)
                                 .compositeOver(MaterialTheme.colors.background)
                         ) {
-                            Text(
-                                text = message.messageText,
-                                modifier = Modifier
-                                    .padding(10.dp),
-                                color = MaterialTheme.colors.onPrimary
-                            )
+                            Row {
+                                Text(
+                                    text = message.messageText,
+                                    modifier = Modifier
+                                        .padding(
+                                            start = 10.dp,
+                                            top = 10.dp,
+                                            end = 10.dp,
+                                            bottom = 10.dp
+                                        ),
+                                    color = MaterialTheme.colors.onPrimary
+                                )
+                                Text(
+                                    modifier = Modifier.padding(top = 25.dp, end = 5.dp),
+                                    text = getTimeFromDate(message.date),
+                                    fontSize = 10.sp,
+                                    color = MaterialTheme.colors.onPrimary
+                                )
+                            }
                         }
                     }
                 }
             }
             LaunchedEffect(messages.size) {
                 if (messages.isNotEmpty()) {
-                    coroutineScope.launch {
-                        listState.animateScrollToItem(messages.lastIndex)
-                    }
+                    listState.animateScrollToItem(messages.lastIndex)
                 }
             }
             MessageTextField(messagesViewModel)
         }
     }
 
+}
+
+private fun getTimeFromDate(date: Date): String {
+    val cal = Calendar.getInstance()
+    cal.time = date
+    return String.format("%02d:%02d", cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE))
+}
+
+private fun getDayFromDate(date: Date): String {
+    val cal = Calendar.getInstance()
+    cal.time = date
+    return "${SimpleDateFormat("MMM").format(cal.time)} ${cal.get(Calendar.DAY_OF_MONTH)}"
 }
 
 @Composable

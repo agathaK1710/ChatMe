@@ -15,6 +15,8 @@ import com.agathakazak.chatme.domain.entity.Response
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.entity.UserLogin
 import com.agathakazak.chatme.domain.entity.UserRegister
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 
 class UserMapper @Inject constructor() {
@@ -28,7 +30,7 @@ class UserMapper @Inject constructor() {
         stubImageColor = user.stubImageColor
     )
 
-    fun <T> mapResponseDtoToModel(responseDto: ResponseDto<T>) = Response<T>(
+    fun <T> mapResponseDtoToModel(responseDto: ResponseDto<T>) = Response(
         data = responseDto.data
     )
 
@@ -48,14 +50,14 @@ class UserMapper @Inject constructor() {
     )
 
     private fun mapMessageDtoToModel(messageDto: MessageDto) = Message(
-        id = messageDto.id,
-        senderId = messageDto.senderId,
-        recipientId = messageDto.recipientId,
-        messageText = messageDto.messageText,
-        date = messageDto.date,
-        attachmentId = messageDto.attachmentId,
-        isUnread = messageDto.isUnread
-    )
+            id = messageDto.id,
+            senderId = messageDto.senderId,
+            recipientId = messageDto.recipientId,
+            messageText = messageDto.messageText,
+            date = Date(messageDto.date),
+            attachmentId = messageDto.attachmentId,
+            isUnread = messageDto.isUnread
+        )
 
     fun mapMessageDtoListToModelList(messageDtoList: List<MessageDto>): List<Message> {
         return messageDtoList.map { mapMessageDtoToModel(it) }
@@ -66,7 +68,7 @@ class UserMapper @Inject constructor() {
         senderId = message.senderId,
         recipientId = message.recipientId,
         messageText = message.messageText,
-        date = message.date,
+        date = message.date.time,
         attachmentId = message.attachmentId,
         isUnread = message.isUnread
     )

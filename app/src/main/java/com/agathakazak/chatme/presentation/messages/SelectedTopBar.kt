@@ -21,7 +21,11 @@ import androidx.compose.ui.unit.dp
 import com.agathakazak.chatme.R
 
 @Composable
-fun SelectedTopBar(selectedCount: Int, closeClick: () -> Unit, deleteClick: () -> Unit) {
+fun SelectedTopBar(
+    selectedCount: Int,
+    closeClick: () -> Unit,
+    deleteClick: () -> Unit
+) {
     TopAppBar(
         title = {
             Text(text = selectedCount.toString(), color = Color.White)
