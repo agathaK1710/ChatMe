@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -38,18 +37,16 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -60,7 +57,6 @@ import com.agathakazak.chatme.R
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.presentation.getApplicationComponent
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -78,7 +74,10 @@ fun MessagesScreen(
     val messagesViewModel = viewModel<MessagesViewModel>(factory = component.getViewModelFactory())
     val screenState =
         messagesViewModel.messagesScreenState.observeAsState(MessagesScreenState.Initial)
-
+    val repliedMessage = messagesViewModel.repliedMessage.observeAsState().value
+    if (repliedMessage != null){
+        messagesViewModel.sendMessage(repliedMessage)
+    }
     MessagesScreenContent(
         screenState,
         messagesViewModel,
@@ -113,7 +112,9 @@ private fun MessagesScreenContent(
             Messages(
                 messagesViewModel,
                 messagesViewModel.messages,
-                setOnLongClick = { setOnLongClick(it) }
+                setOnLongClick = { setOnLongClick(it) },
+                currentState.sender,
+                currentState.recipient.id
             )
             setUser(currentState.recipient)
         }
@@ -127,7 +128,9 @@ private fun MessagesScreenContent(
 private fun Messages(
     messagesViewModel: MessagesViewModel,
     messages: List<Message>,
-    setOnLongClick: (Boolean) -> Unit
+    setOnLongClick: (Boolean) -> Unit,
+    sender: User,
+    recipientId: Int
 ) {
     val listState = rememberLazyListState()
     var onLongClickState by rememberSaveable { mutableStateOf(false) }
@@ -218,6 +221,7 @@ private fun Messages(
                         }
                         if (message.recipientId == messagesViewModel.recipientId) {
                             Spacer(modifier = Modifier.weight(1f))
+
                         }
                         if (messagesViewModel.getSelectedMessages().isEmpty()) {
                             onLongClickState = false
@@ -280,7 +284,7 @@ private fun Messages(
                     listState.animateScrollToItem(messages.lastIndex)
                 }
             }
-            MessageTextField(messagesViewModel)
+            MessageTextField(messagesViewModel, sender, recipientId)
         }
     }
 
@@ -344,8 +348,9 @@ private fun Dialog(
 }
 
 @Composable
-fun MessageTextField(messagesViewModel: MessagesViewModel) {
+fun MessageTextField(messagesViewModel: MessagesViewModel, sender: User, recipientId: Int) {
     var messageText by rememberSaveable { mutableStateOf("") }
+    val context = LocalContext.current
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -408,6 +413,7 @@ fun MessageTextField(messagesViewModel: MessagesViewModel) {
         } else {
             IconButton(onClick = {
                 messagesViewModel.sendMessage(messageText)
+                messagesViewModel.messageNotification(recipientId, sender, messageText, context)
                 messageText = ""
             }) {
                 Icon(

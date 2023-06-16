@@ -166,7 +166,6 @@ private fun MainTopBar(
                 if (user != null) {
                     MessagesTopBar(user) {
                         navigationState.navHostController.popBackStack()
-                        menuClick()
                     }
                 } else {
                     ChatTopBar {
@@ -222,10 +221,10 @@ private fun NavigationGraph(
         chatsScreenContext = {
             ChatScreen(viewModelFactory) {
                 navigationState.navigateToChat(it)
-                changeMenuState()
             }
         },
         chatScreenContext = {
+            changeMenuState()
             MessagesScreen(
                 it,
                 setUser = { user ->

@@ -16,6 +16,5 @@ class ChatMeApplication : Application() {
 
 @Composable
 fun getApplicationComponent(): ApplicationComponent {
-    Log.d("RECOMPOSE", "getApplicationComponent" )
     return (LocalContext.current.applicationContext as ChatMeApplication).component
 }
