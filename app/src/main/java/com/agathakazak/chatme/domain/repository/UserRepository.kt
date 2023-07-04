@@ -18,4 +18,6 @@ interface UserRepository {
     suspend fun getChat(senderId: Int, recipientId: Int): List<Message>
     suspend fun sendMessage(messageRequest: MessageRequest)
     suspend fun deleteMessages(ids: List<Int>)
+    suspend fun readMessages(id: Int)
+    suspend fun getUnreadedMessages(senderId: Int, recipientId: Int): List<Message>
 }

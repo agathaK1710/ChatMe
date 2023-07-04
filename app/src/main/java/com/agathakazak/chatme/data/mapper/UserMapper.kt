@@ -15,8 +15,6 @@ import com.agathakazak.chatme.domain.entity.Response
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.entity.UserLogin
 import com.agathakazak.chatme.domain.entity.UserRegister
-import java.text.SimpleDateFormat
-import java.util.Date
 import javax.inject.Inject
 
 class UserMapper @Inject constructor() {
@@ -54,7 +52,7 @@ class UserMapper @Inject constructor() {
             senderId = messageDto.senderId,
             recipientId = messageDto.recipientId,
             messageText = messageDto.messageText,
-            date = Date(messageDto.date),
+            date = messageDto.date,
             attachmentId = messageDto.attachmentId,
             isUnread = messageDto.isUnread
         )
@@ -68,7 +66,7 @@ class UserMapper @Inject constructor() {
         senderId = message.senderId,
         recipientId = message.recipientId,
         messageText = message.messageText,
-        date = message.date.time,
+        date = message.date,
         attachmentId = message.attachmentId,
         isUnread = message.isUnread
     )

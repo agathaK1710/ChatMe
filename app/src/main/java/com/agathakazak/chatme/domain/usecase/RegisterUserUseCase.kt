@@ -1,6 +1,5 @@
 package com.agathakazak.chatme.domain.usecase
 
-import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.entity.UserRegister
 import com.agathakazak.chatme.domain.repository.UserRepository
 import javax.inject.Inject

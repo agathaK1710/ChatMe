@@ -7,7 +7,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.domain.entity.UserLogin
 import com.agathakazak.chatme.domain.usecase.LoginUserUseCase
-import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException

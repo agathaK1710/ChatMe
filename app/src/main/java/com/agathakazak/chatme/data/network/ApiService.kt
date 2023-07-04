@@ -9,10 +9,10 @@ import com.agathakazak.chatme.data.model.UserDto
 import com.agathakazak.chatme.data.model.UserLoginDto
 import com.agathakazak.chatme.data.model.UserRegisterDto
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.HTTP
 import retrofit2.http.Header
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -60,6 +60,17 @@ interface ApiService {
 
     @GET("chat")
     suspend fun getChat(
+        @Query(QUERY_SENDER_ID) senderId: Int,
+        @Query(QUERY_RECIPIENT_ID) recipientId: Int
+    ): List<MessageDto>
+
+    @PATCH("messages/{id}")
+    suspend fun readMessages(
+        @Path(PATH_ID) recipientId: Int
+    )
+
+    @GET("unreadedMessages")
+    suspend fun getUnreadedMessages(
         @Query(QUERY_SENDER_ID) senderId: Int,
         @Query(QUERY_RECIPIENT_ID) recipientId: Int
     ): List<MessageDto>

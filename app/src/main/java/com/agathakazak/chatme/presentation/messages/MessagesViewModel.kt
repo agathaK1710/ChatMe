@@ -20,29 +20,40 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.agathakazak.chatme.R
+import com.agathakazak.chatme.data.network.WebSocketClient
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.MessageRequest
+import com.agathakazak.chatme.domain.entity.MessageType
+import com.agathakazak.chatme.domain.entity.SocketMessage
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.usecase.DeleteMessagesUseCase
 import com.agathakazak.chatme.domain.usecase.GetChatUseCase
+import com.agathakazak.chatme.domain.usecase.GetUnreadedMessagesUseCase
 import com.agathakazak.chatme.domain.usecase.GetUserByIdUseCase
 import com.agathakazak.chatme.domain.usecase.GetUserByTokenUseCase
+import com.agathakazak.chatme.domain.usecase.ReadMessagesUseCase
 import com.agathakazak.chatme.domain.usecase.SendMessageUseCase
 import com.agathakazak.chatme.navigation.Screen
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import retrofit2.HttpException
+import okhttp3.WebSocket
+import okhttp3.WebSocketListener
+import java.lang.reflect.Type
 import javax.inject.Inject
+
 
 class MessagesViewModel @Inject constructor(
     private val getUserByTokenUseCase: GetUserByTokenUseCase,
     private val getChatUseCase: GetChatUseCase,
     private val getUserByIdUseCase: GetUserByIdUseCase,
-    private val sendMessage: SendMessageUseCase,
+    private val sendMessageUseCase: SendMessageUseCase,
     private val sharedPreferences: SharedPreferences,
     private val deleteMessageUseCase: DeleteMessagesUseCase,
+    private val readMessagesUseCase: ReadMessagesUseCase,
+    private val getUnreadedMessagesUseCase: GetUnreadedMessagesUseCase,
     val recipientId: Int,
     private val notificationManager: NotificationManager,
     private val notificationBuilder: NotificationCompat.Builder
@@ -57,6 +68,7 @@ class MessagesViewModel @Inject constructor(
     }
 
     private var user: Deferred<User>
+    private lateinit var socket: WebSocket
 
     private val _messagesScreenState =
         MutableLiveData<MessagesScreenState>(MessagesScreenState.Initial)
@@ -70,16 +82,49 @@ class MessagesViewModel @Inject constructor(
     val repliedMessage: LiveData<String?> = _repliedMessage
 
     init {
-        sharedPreferences.edit().remove(MESSAGE).apply()
         user = viewModelScope.async {
             getUserByTokenUseCase("Bearer " + getToken()!!)
         }
+        viewModelScope.launch {
+            socket = createSocket()
+        }
+        sharedPreferences.edit().remove(MESSAGE).apply()
         _messagesScreenState.value = MessagesScreenState.Loading
         loadMessages()
     }
 
     fun changeSelectedStatus(index: Int, isSelected: Boolean) {
         _messages[index].isSelected = isSelected
+    }
+
+    private suspend fun createSocket(): WebSocket {
+        val userId = user.await().id
+        val socketListener = object : WebSocketListener() {
+            override fun onMessage(webSocket: WebSocket, text: String) {
+                viewModelScope.launch {
+                    val message = Gson().fromJson(text, SocketMessage::class.java)
+                    when (message.type) {
+                        MessageType.INSERT -> {
+                            _messages.add(getChatUseCase(userId, recipientId).last())
+                        }
+
+                        MessageType.DELETE -> {
+                            val jsonArr = Gson().toJson(message.data)
+                            val listType: Type = object : TypeToken<List<Message>>() {}.type
+                            val selectedMessages: List<Message> = Gson().fromJson(jsonArr, listType)
+                            selectedMessages.forEach { selectedMessage ->
+                                _messages.removeIf { selectedMessage.id == it.id }
+                            }
+                        }
+
+                        MessageType.UPDATE -> {
+
+                        }
+                    }
+                }
+            }
+        }
+        return WebSocketClient.createWebSocket(userId, socketListener)
     }
 
     fun unselectAllMessages() {
@@ -102,8 +147,14 @@ class MessagesViewModel @Inject constructor(
     fun deleteSelectedMessages() {
         viewModelScope.launch {
             val selectedMessages = getSelectedMessages()
-            deleteMessageUseCase(selectedMessages.map { it.id!! })
-            _messages.removeAll(selectedMessages)
+            socket.send(
+                Gson().toJson(
+                    SocketMessage(
+                        selectedMessages,
+                        MessageType.DELETE
+                    )
+                )
+            )
         }
     }
 
@@ -119,15 +170,13 @@ class MessagesViewModel @Inject constructor(
                 messageText,
                 attachmentId
             )
-            try {
-                sendMessage(messageRequest)
-                _messages.add(getChatUseCase(user.await().id, recipientId).last())
-            } catch (e: HttpException) {
-                val responseString = e.response()?.errorBody()?.string()
-                val gson = Gson()
-                val response = gson.fromJson(responseString, String::class.java)
-            }
+            socket.send(Gson().toJson(SocketMessage(messageRequest, MessageType.INSERT)))
+
         }
+    }
+
+    fun readMessages() = viewModelScope.launch {
+        readMessagesUseCase(recipientId)
     }
 
     fun messageNotification(

@@ -1,7 +1,6 @@
 package com.agathakazak.chatme.presentation
 
 import android.app.Application
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import com.agathakazak.chatme.di.ApplicationComponent

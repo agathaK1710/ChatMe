@@ -1,8 +1,8 @@
 package com.agathakazak.chatme.di
 
 import android.content.Context
-import com.agathakazak.chatme.presentation.messages.NotificationReceiver
 import com.agathakazak.chatme.presentation.ViewModelFactory
+import com.agathakazak.chatme.presentation.messages.NotificationReceiver
 import dagger.BindsInstance
 import dagger.Component
 

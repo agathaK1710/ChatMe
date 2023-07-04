@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
@@ -41,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
@@ -75,9 +77,10 @@ fun MessagesScreen(
     val screenState =
         messagesViewModel.messagesScreenState.observeAsState(MessagesScreenState.Initial)
     val repliedMessage = messagesViewModel.repliedMessage.observeAsState().value
-    if (repliedMessage != null){
+    if (repliedMessage != null) {
         messagesViewModel.sendMessage(repliedMessage)
     }
+    messagesViewModel.readMessages()
     MessagesScreenContent(
         screenState,
         messagesViewModel,
@@ -109,6 +112,7 @@ private fun MessagesScreenContent(
         }
 
         is MessagesScreenState.Messages -> {
+            messagesViewModel.readMessages()
             Messages(
                 messagesViewModel,
                 messagesViewModel.messages,
@@ -178,15 +182,15 @@ private fun Messages(
             ) {
                 itemsIndexed(items = messages) { index, message ->
                     lastDate = if (index != 0) {
-                        getDayFromDate(messages[index - 1].date)
+                        getDayFromDate(Date(messages[index - 1].date))
                     } else {
                         ""
                     }
-                    if (lastDate != getDayFromDate(message.date)) {
+                    if (lastDate != getDayFromDate(Date(message.date))) {
                         Text(
                             modifier = Modifier
                                 .fillMaxWidth(),
-                            text = getDayFromDate(message.date),
+                            text = getDayFromDate(Date(message.date)),
                             color = MaterialTheme.colors.primaryVariant,
                             textAlign = TextAlign.Center
                         )
@@ -225,6 +229,15 @@ private fun Messages(
                         }
                         if (messagesViewModel.getSelectedMessages().isEmpty()) {
                             onLongClickState = false
+                        }
+                        if (message.isUnread && message.senderId == sender.id) {
+                            Box(
+                                modifier = Modifier
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colors.primaryVariant)
+                                    .align(Alignment.CenterVertically)
+                            )
                         }
                         Card(
                             modifier = Modifier
@@ -270,7 +283,7 @@ private fun Messages(
                                 )
                                 Text(
                                     modifier = Modifier.padding(top = 25.dp, end = 5.dp),
-                                    text = getTimeFromDate(message.date),
+                                    text = getTimeFromDate(Date(message.date)),
                                     fontSize = 10.sp,
                                     color = MaterialTheme.colors.onPrimary
                                 )

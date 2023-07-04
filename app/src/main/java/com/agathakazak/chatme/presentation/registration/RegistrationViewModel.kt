@@ -4,10 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.entity.UserRegister
 import com.agathakazak.chatme.domain.usecase.RegisterUserUseCase
-import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import retrofit2.HttpException

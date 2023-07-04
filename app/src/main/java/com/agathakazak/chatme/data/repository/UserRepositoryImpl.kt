@@ -66,4 +66,17 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun deleteMessages(ids: List<Int>) {
         apiService.deleteMessages(mapper.mapIdsListToDto(ids))
     }
+
+    override suspend fun readMessages(recipientId: Int) {
+        apiService.readMessages(recipientId)
+    }
+
+    override suspend fun getUnreadedMessages(senderId: Int, recipientId: Int): List<Message> {
+        return mapper.mapMessageDtoListToModelList(
+            apiService.getUnreadedMessages(
+                senderId,
+                recipientId
+            )
+        )
+    }
 }
