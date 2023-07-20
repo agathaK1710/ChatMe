@@ -1,6 +1,7 @@
 package com.agathakazak.chatme.presentation.chats
 
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,11 +18,11 @@ class ChatsViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences
 ) : ViewModel() {
 
-    private val _chatScreenState = MutableLiveData<AllChatScreenState>(AllChatScreenState.Initial)
-    val chatScreenState: LiveData<AllChatScreenState> = _chatScreenState
+    private val _chatScreenState = MutableLiveData<AllChatsScreenState>(AllChatsScreenState.Initial)
+    val chatScreenState: LiveData<AllChatsScreenState> = _chatScreenState
 
     init {
-        _chatScreenState.value = AllChatScreenState.Loading
+        _chatScreenState.value = AllChatsScreenState.Loading
         loadAllChats()
     }
 
@@ -30,7 +31,7 @@ class ChatsViewModel @Inject constructor(
             getUserByTokenUseCase("Bearer " + getToken()!!)
         }
         viewModelScope.launch {
-            _chatScreenState.value = AllChatScreenState.Chats(
+            _chatScreenState.value = AllChatsScreenState.Chats(
                 getChatsForUserUseCase(sender.await().id)
             )
         }

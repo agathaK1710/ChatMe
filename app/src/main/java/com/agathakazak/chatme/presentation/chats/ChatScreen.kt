@@ -19,18 +19,18 @@ fun ChatScreen(
     navigateToMessages: (id: Int) -> Unit
 ) {
     val chatViewModel = viewModel<ChatsViewModel>(factory = viewModelFactory)
-    val screenState = chatViewModel.chatScreenState.observeAsState(AllChatScreenState.Initial)
+    val screenState = chatViewModel.chatScreenState.observeAsState(AllChatsScreenState.Initial)
 
     when (val currentState = screenState.value) {
-        is AllChatScreenState.Chats -> {
+        is AllChatsScreenState.Chats -> {
             LazyColumn {
-                items(items = currentState.chats, key = { it.companion.id }) {
-                    ChatItem(it.companion, it.lastMessage, it.isUnread, navigateToMessages)
+                items(items = currentState.chats, key = {it.id }) {
+                    ChatItem(it, navigateToMessages)
                 }
             }
         }
 
-        is AllChatScreenState.Loading -> {
+        is AllChatsScreenState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center

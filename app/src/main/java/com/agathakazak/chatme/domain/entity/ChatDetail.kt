@@ -1,9 +1,9 @@
 package com.agathakazak.chatme.domain.entity
 
-data class Chat(
-    val id: Int,
+data class ChatDetail(
     val chatName: String,
     val chatImageUrl: String?,
     val stubImageColor: Int,
-    val lastMessage: Message
+    val members: List<User>,
+    val messages: List<Message>
 )

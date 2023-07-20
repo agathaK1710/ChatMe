@@ -22,25 +22,26 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.agathakazak.chatme.R
+import com.agathakazak.chatme.domain.entity.Chat
 import com.agathakazak.chatme.domain.entity.User
+import com.agathakazak.chatme.ui.theme.Blue900
 
 @Composable
 fun ChatItem(
-    user: User,
-    message: String,
-    isUnread: Boolean,
+    chat: Chat,
     navigateToMessages: (id: Int) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable {
-                navigateToMessages(user.id)
+                navigateToMessages(chat.id)
             },
         backgroundColor = MaterialTheme.colors.background,
         shape = RectangleShape,
@@ -51,12 +52,12 @@ fun ChatItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (user.imageUrl != null) {
+            if (chat.chatImageUrl != null) {
                 AsyncImage(
                     modifier = Modifier
                         .size(45.dp)
                         .clip(CircleShape),
-                    model = "${user.imageUrl}",
+                    model = "${chat.chatImageUrl}",
                     contentScale = ContentScale.Crop,
                     contentDescription = null
                 )
@@ -69,35 +70,33 @@ fun ChatItem(
                     Image(
                         painter = painterResource(id = R.drawable.random_background),
                         colorFilter = ColorFilter.tint(
-                            color = Color(user.stubImageColor)
+                            color = Color(chat.stubImageColor)
                         ),
                         contentScale = ContentScale.Crop,
                         contentDescription = null
                     )
                     Text(
                         modifier = Modifier.align(Alignment.Center),
-                        text = user.firstName.first().uppercase(),
+                        text = chat.chatName.first().uppercase(),
                         fontSize = 20.sp,
                         color = Color.White
                     )
                 }
             }
-
             Column(modifier = Modifier.weight(9f)) {
                 Text(
-                    text = "${user.firstName} ${user.lastName}",
+                    text = chat.chatName,
                     modifier = Modifier.padding(start = 8.dp),
                     color = MaterialTheme.colors.onPrimary,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = message,
+                    text = chat.lastMessage.messageText,
                     modifier = Modifier.padding(start = 8.dp, bottom = 8.dp),
                     color = MaterialTheme.colors.onPrimary
                 )
             }
-
-            if (isUnread) {
+            if (chat.lastMessage.isUnread) {
                 Box(
                     modifier = Modifier.weight(1f)
                 ) {

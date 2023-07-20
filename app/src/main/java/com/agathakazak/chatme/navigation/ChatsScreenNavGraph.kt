@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import androidx.navigation.navigation
-import com.agathakazak.chatme.navigation.Screen.Companion.KEY_RECIPIENT_ID
+import com.agathakazak.chatme.navigation.Screen.Companion.KEY_CHAT_ID
 
 fun NavGraphBuilder.chatsScreenNavGraph(
     chatsScreenContext: @Composable () -> Unit,
@@ -24,14 +24,14 @@ fun NavGraphBuilder.chatsScreenNavGraph(
         composable(
             route = Screen.Chat.route,
             arguments = listOf(
-                navArgument(KEY_RECIPIENT_ID){
+                navArgument(KEY_CHAT_ID){
                     type = NavType.IntType
                 }
             ),
-            deepLinks = listOf(navDeepLink { uriPattern = "$uri/$KEY_RECIPIENT_ID={$KEY_RECIPIENT_ID}" })
+            deepLinks = listOf(navDeepLink { uriPattern = "$uri/$KEY_CHAT_ID={$KEY_CHAT_ID}" })
         ){
-            val recipientId = it.arguments?.getInt(KEY_RECIPIENT_ID) ?: 0
-            chatScreenContext(recipientId)
+            val chatId = it.arguments?.getInt(KEY_CHAT_ID) ?: 0
+            chatScreenContext(chatId)
         }
     }
 }

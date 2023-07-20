@@ -1,7 +1,9 @@
 package com.agathakazak.chatme.presentation.messages
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,10 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.agathakazak.chatme.R
-import com.agathakazak.chatme.domain.entity.User
+import com.agathakazak.chatme.domain.entity.Chat
+import com.agathakazak.chatme.domain.entity.ChatDetail
 
 @Composable
-fun MessagesTopBar(user: User, backClick: () -> Unit) {
+fun MessagesTopBar(chat: ChatDetail, backClick: () -> Unit) {
     TopAppBar(
         title = {
             Row(
@@ -37,12 +40,12 @@ fun MessagesTopBar(user: User, backClick: () -> Unit) {
                     .fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (user.imageUrl != null) {
+                if (chat.chatImageUrl != null) {
                     AsyncImage(
                         modifier = Modifier
                             .size(45.dp)
                             .clip(CircleShape),
-                        model = "${user.imageUrl}",
+                        model = "${chat.chatImageUrl}",
                         contentScale = ContentScale.Crop,
                         contentDescription = null
                     )
@@ -55,24 +58,32 @@ fun MessagesTopBar(user: User, backClick: () -> Unit) {
                         Image(
                             painter = painterResource(id = R.drawable.random_background),
                             colorFilter = ColorFilter.tint(
-                                color = Color(user.stubImageColor)
+                                color = Color(chat.stubImageColor)
                             ),
                             contentScale = ContentScale.Crop,
                             contentDescription = null
                         )
                         Text(
                             modifier = Modifier.align(Alignment.Center),
-                            text = user.firstName.first().uppercase(),
+                            text = chat.chatName.first().uppercase(),
                             fontSize = 18.sp,
                             color = Color.White
                         )
                     }
                 }
-                Text(
-                    text = "${user.firstName} ${user.lastName}",
-                    modifier = Modifier.padding(start = 10.dp),
-                    color = Color.White
-                )
+                Column(verticalArrangement = Arrangement.Center) {
+                    Text(
+                        text = chat.chatName,
+                        modifier = Modifier.padding(start = 10.dp),
+                        color = Color.White
+                    )
+                    Text(
+                        text = "${chat.members.size} members",
+                        fontSize = 10.sp,
+                        modifier = Modifier.padding(start = 10.dp),
+                        color = Color.White
+                    )
+                }
             }
         },
         navigationIcon = {

@@ -1,5 +1,6 @@
 package com.agathakazak.chatme.data.network
 
+import com.agathakazak.chatme.data.model.ChatDetailDto
 import com.agathakazak.chatme.data.model.ChatDto
 import com.agathakazak.chatme.data.model.IdsListDto
 import com.agathakazak.chatme.data.model.MessageDto
@@ -43,26 +44,20 @@ interface ApiService {
         @Path(PATH_ID) uerId: Int
     ): UserDto
 
-    @POST("message")
-    suspend fun sendMessage(
-        @Body message: MessageRequestDto
-    )
-
     @HTTP(method = "DELETE", path = "messages", hasBody = true)
     suspend fun deleteMessages(
         @Body messageIds: IdsListDto
     )
 
-    @GET("chats")
+    @GET("chats/{id}")
     suspend fun getChatsForUser(
-        @Query(QUERY_SENDER_ID) senderId: Int
+        @Path(PATH_ID) userId: Int
     ): List<ChatDto>
 
-    @GET("chat")
+    @GET("chat/{id}")
     suspend fun getChat(
-        @Query(QUERY_SENDER_ID) senderId: Int,
-        @Query(QUERY_RECIPIENT_ID) recipientId: Int
-    ): List<MessageDto>
+        @Path(PATH_ID) chatId: Int
+    ): ChatDetailDto
 
     @PATCH("messages/{id}")
     suspend fun readMessages(

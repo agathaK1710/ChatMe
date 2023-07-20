@@ -6,6 +6,5 @@ data class User(
     val lastName: String,
     val phoneNumber: String,
     val email: String,
-    val imageUrl: String?,
-    val stubImageColor: Int
+    val imageUrl: String?
 )

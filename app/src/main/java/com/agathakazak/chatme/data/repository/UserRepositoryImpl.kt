@@ -1,8 +1,9 @@
 package com.agathakazak.chatme.data.repository
 
-import com.agathakazak.chatme.data.mapper.UserMapper
+import com.agathakazak.chatme.data.mapper.ChatMeMapper
 import com.agathakazak.chatme.data.network.ApiService
 import com.agathakazak.chatme.domain.entity.Chat
+import com.agathakazak.chatme.domain.entity.ChatDetail
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.MessageRequest
 import com.agathakazak.chatme.domain.entity.Response
@@ -13,7 +14,7 @@ import com.agathakazak.chatme.domain.repository.UserRepository
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val mapper: UserMapper,
+    private val mapper: ChatMeMapper,
     private val apiService: ApiService
 ) : UserRepository {
     override suspend fun registerUser(user: UserRegister) {
@@ -46,21 +47,12 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun getChatsForUser(userId: Int): List<Chat> {
         return apiService.getChatsForUser(userId).map {
-            val companionUser = apiService.getUserById(it.companionId)
-            mapper.mapChatDtoToModel(it, companionUser)
+            mapper.mapChatDtoToModel(it)
         }
     }
 
-    override suspend fun getChat(senderId: Int, recipientId: Int): List<Message> {
-        return mapper.mapMessageDtoListToModelList(apiService.getChat(senderId, recipientId))
-    }
-
-    override suspend fun sendMessage(
-        messageRequest: MessageRequest
-    ) {
-        return apiService.sendMessage(
-            mapper.mapMessageRequestModelToDto(messageRequest)
-        )
+    override suspend fun getChat(chatId: Int): ChatDetail {
+        return mapper.mapChatDetailDtoToModel(apiService.getChat(chatId))
     }
 
     override suspend fun deleteMessages(ids: List<Int>) {

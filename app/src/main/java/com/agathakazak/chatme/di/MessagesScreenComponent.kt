@@ -14,7 +14,7 @@ interface MessagesScreenComponent {
     @Subcomponent.Factory
     interface Factory{
         fun create(
-            @BindsInstance recipientId: Int
+            @BindsInstance chatId: Int
         ): MessagesScreenComponent
     }
 }

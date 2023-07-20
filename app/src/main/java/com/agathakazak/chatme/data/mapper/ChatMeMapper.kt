@@ -1,5 +1,6 @@
 package com.agathakazak.chatme.data.mapper
 
+import com.agathakazak.chatme.data.model.ChatDetailDto
 import com.agathakazak.chatme.data.model.ChatDto
 import com.agathakazak.chatme.data.model.IdsListDto
 import com.agathakazak.chatme.data.model.MessageDto
@@ -9,25 +10,18 @@ import com.agathakazak.chatme.data.model.UserDto
 import com.agathakazak.chatme.data.model.UserLoginDto
 import com.agathakazak.chatme.data.model.UserRegisterDto
 import com.agathakazak.chatme.domain.entity.Chat
+import com.agathakazak.chatme.domain.entity.ChatDetail
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.MessageRequest
 import com.agathakazak.chatme.domain.entity.Response
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.domain.entity.UserLogin
 import com.agathakazak.chatme.domain.entity.UserRegister
+import java.time.Instant
+import java.util.Date
 import javax.inject.Inject
 
-class UserMapper @Inject constructor() {
-    fun mapUserModelToDto(user: User) = UserDto(
-        id = user.id,
-        firstName = user.firstName,
-        lastName = user.lastName,
-        phoneNumber = user.phoneNumber,
-        email = user.email,
-        imageUrl = user.imageUrl,
-        stubImageColor = user.stubImageColor
-    )
-
+class ChatMeMapper @Inject constructor() {
     fun <T> mapResponseDtoToModel(responseDto: ResponseDto<T>) = Response(
         data = responseDto.data
     )
@@ -38,8 +32,7 @@ class UserMapper @Inject constructor() {
         lastName = userDto.lastName,
         phoneNumber = userDto.phoneNumber,
         email = userDto.email,
-        imageUrl = userDto.imageUrl,
-        stubImageColor = userDto.stubImageColor
+        imageUrl = userDto.imageUrl
     )
 
     fun mapUserLoginModelToDto(userLogin: UserLogin) = UserLoginDto(
@@ -48,35 +41,18 @@ class UserMapper @Inject constructor() {
     )
 
     private fun mapMessageDtoToModel(messageDto: MessageDto) = Message(
-            id = messageDto.id,
-            senderId = messageDto.senderId,
-            recipientId = messageDto.recipientId,
-            messageText = messageDto.messageText,
-            date = messageDto.date,
-            attachmentId = messageDto.attachmentId,
-            isUnread = messageDto.isUnread
-        )
+        id = messageDto.id,
+        senderId = messageDto.senderId,
+        chatId = messageDto.chatId,
+        messageText = messageDto.messageText,
+        date = Date(messageDto.date),
+        attachmentId = messageDto.attachmentId,
+        isUnread = messageDto.isUnread
+    )
 
     fun mapMessageDtoListToModelList(messageDtoList: List<MessageDto>): List<Message> {
         return messageDtoList.map { mapMessageDtoToModel(it) }
     }
-
-    fun mapMessageModelToDto(message: Message) = MessageDto(
-        id = message.id,
-        senderId = message.senderId,
-        recipientId = message.recipientId,
-        messageText = message.messageText,
-        date = message.date,
-        attachmentId = message.attachmentId,
-        isUnread = message.isUnread
-    )
-
-    fun mapMessageRequestModelToDto(messageRequest: MessageRequest) = MessageRequestDto(
-        senderId = messageRequest.senderId,
-        recipientId = messageRequest.recipientId,
-        messageText = messageRequest.messageText,
-        attachmentId = messageRequest.attachmentId
-    )
 
     fun mapIdsListToDto(ids: List<Int>) = IdsListDto(ids)
 
@@ -86,15 +62,30 @@ class UserMapper @Inject constructor() {
         phoneNumber = userRegister.phoneNumber,
         email = userRegister.email,
         password = userRegister.password,
-        imageUrl = userRegister.imageUrl,
-        stubImageColor = userRegister.stubImageColor
+        imageUrl = userRegister.imageUrl
     )
 
-    fun mapChatDtoToModel(chatsDto: ChatDto, companion: UserDto): Chat {
+    fun mapChatDtoToModel(chatsDto: ChatDto): Chat {
         return Chat(
-            companion = mapUserDtoToModel(companion),
-            lastMessage = chatsDto.lastMessage,
-            isUnread = chatsDto.isUnread
+            id = chatsDto.id,
+            chatName = chatsDto.chatName,
+            chatImageUrl = chatsDto.chatImageUrl,
+            stubImageColor = chatsDto.stubImageColor,
+            lastMessage = mapMessageDtoToModel(chatsDto.lastMessage)
+        )
+    }
+
+    fun mapChatDetailDtoToModel(chatDetailDto: ChatDetailDto): ChatDetail {
+        return ChatDetail(
+            chatName = chatDetailDto.chatName,
+            chatImageUrl = chatDetailDto.chatImageUrl,
+            stubImageColor = chatDetailDto.stubImageColor,
+            members = chatDetailDto.members.map {
+                mapUserDtoToModel(it)
+            },
+            messages = chatDetailDto.messages.map {
+                mapMessageDtoToModel(it)
+            },
         )
     }
 }

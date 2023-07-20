@@ -6,6 +6,5 @@ data class UserRegister(
     val phoneNumber: String,
     val email: String,
     val password: String,
-    val imageUrl: String?,
-    val stubImageColor: Int
+    val imageUrl: String? = null
 )

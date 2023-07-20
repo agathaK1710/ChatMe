@@ -55,9 +55,9 @@ fun ContactItem(user: User) {
                     ) {
                         Image(
                             painter = painterResource(id = R.drawable.random_background),
-                            colorFilter = ColorFilter.tint(
-                                color = Color(user.stubImageColor)
-                            ),
+//                            colorFilter = ColorFilter.tint(
+//                                color = Color(user.stubImageColor)
+//                            ),
                             contentScale = ContentScale.Crop,
                             contentDescription = null
                         )

@@ -6,8 +6,8 @@ sealed class Screen(val route: String) {
     object Chats : Screen(ROUTE_CHATS)
     object Chat : Screen(ROUTE_CHAT) {
         private const val ROUTE_FOR_ARGS = "chat"
-        fun getRouteWithArguments(recipientId: Int): String {
-            return "$ROUTE_FOR_ARGS/$recipientId"
+        fun getRouteWithArguments(chatId: Int): String {
+            return "$ROUTE_FOR_ARGS/$chatId"
         }
     }
 
@@ -17,8 +17,8 @@ sealed class Screen(val route: String) {
     companion object {
         private const val ROUTE_LOGIN = "login"
         private const val ROUTE_REGISTRATION = "registration"
-        const val KEY_RECIPIENT_ID = "recipient_id"
-        private const val ROUTE_CHAT = "chat/{$KEY_RECIPIENT_ID}"
+        const val KEY_CHAT_ID = "chat_id"
+        private const val ROUTE_CHAT = "chat/{$KEY_CHAT_ID}"
         private const val ROUTE_CHATS = "chats"
         private const val ROUTE_CHATS_GRAPH = "chats_graph"
         private const val ROUTE_SETTINGS = "settings"

@@ -26,13 +26,8 @@ import com.agathakazak.chatme.domain.entity.MessageRequest
 import com.agathakazak.chatme.domain.entity.MessageType
 import com.agathakazak.chatme.domain.entity.SocketMessage
 import com.agathakazak.chatme.domain.entity.User
-import com.agathakazak.chatme.domain.usecase.DeleteMessagesUseCase
 import com.agathakazak.chatme.domain.usecase.GetChatUseCase
-import com.agathakazak.chatme.domain.usecase.GetUnreadedMessagesUseCase
-import com.agathakazak.chatme.domain.usecase.GetUserByIdUseCase
 import com.agathakazak.chatme.domain.usecase.GetUserByTokenUseCase
-import com.agathakazak.chatme.domain.usecase.ReadMessagesUseCase
-import com.agathakazak.chatme.domain.usecase.SendMessageUseCase
 import com.agathakazak.chatme.navigation.Screen
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -48,13 +43,8 @@ import javax.inject.Inject
 class MessagesViewModel @Inject constructor(
     private val getUserByTokenUseCase: GetUserByTokenUseCase,
     private val getChatUseCase: GetChatUseCase,
-    private val getUserByIdUseCase: GetUserByIdUseCase,
-    private val sendMessageUseCase: SendMessageUseCase,
     private val sharedPreferences: SharedPreferences,
-    private val deleteMessageUseCase: DeleteMessagesUseCase,
-    private val readMessagesUseCase: ReadMessagesUseCase,
-    private val getUnreadedMessagesUseCase: GetUnreadedMessagesUseCase,
-    val recipientId: Int,
+    val chatId: Int,
     private val notificationManager: NotificationManager,
     private val notificationBuilder: NotificationCompat.Builder
 
@@ -105,7 +95,7 @@ class MessagesViewModel @Inject constructor(
                     val message = Gson().fromJson(text, SocketMessage::class.java)
                     when (message.type) {
                         MessageType.INSERT -> {
-                            _messages.add(getChatUseCase(userId, recipientId).last())
+                            _messages.add(getChatUseCase(chatId).messages.last())
                         }
 
                         MessageType.DELETE -> {
@@ -137,10 +127,11 @@ class MessagesViewModel @Inject constructor(
 
     private fun loadMessages() {
         viewModelScope.launch {
-            val sender = user.await()
-            _messages.addAll(getChatUseCase(user.await().id, recipientId))
+            val userId = user.await().id
+            val chat = getChatUseCase(chatId)
+            _messages.addAll(chat.messages)
             _messagesScreenState.value =
-                MessagesScreenState.Messages(getUserByIdUseCase(recipientId), sender)
+                MessagesScreenState.Messages(chat, userId)
         }
     }
 
@@ -166,7 +157,7 @@ class MessagesViewModel @Inject constructor(
         viewModelScope.launch {
             val messageRequest = MessageRequest(
                 senderId = user.await().id,
-                recipientId,
+                chatId,
                 messageText,
                 attachmentId
             )
@@ -175,9 +166,9 @@ class MessagesViewModel @Inject constructor(
         }
     }
 
-    fun readMessages() = viewModelScope.launch {
-        readMessagesUseCase(recipientId)
-    }
+//    fun readMessages() = viewModelScope.launch {
+//        readMessagesUseCase(recipientId)
+//    }
 
     fun messageNotification(
         recipientId: Int,
@@ -189,7 +180,7 @@ class MessagesViewModel @Inject constructor(
 
         val intent = Intent(
             Intent.ACTION_VIEW,
-            "chatme://chats_graph/${Screen.KEY_RECIPIENT_ID}=$recipientId".toUri()
+            "chatme://chats_graph/${Screen.KEY_CHAT_ID}=$recipientId".toUri()
         )
 
         val pendingIntent = TaskStackBuilder.create(context).run {

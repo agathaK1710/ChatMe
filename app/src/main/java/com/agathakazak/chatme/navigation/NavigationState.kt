@@ -14,8 +14,8 @@ class NavigationState(
         }
     }
 
-    fun navigateToChat(recipientId: Int) {
-        navHostController.navigate(Screen.Chat.getRouteWithArguments(recipientId))
+    fun navigateToChat(chatId: Int) {
+        navHostController.navigate(Screen.Chat.getRouteWithArguments(chatId))
     }
 }
 

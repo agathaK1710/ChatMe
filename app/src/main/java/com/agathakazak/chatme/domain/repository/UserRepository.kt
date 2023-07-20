@@ -1,6 +1,7 @@
 package com.agathakazak.chatme.domain.repository
 
 import com.agathakazak.chatme.domain.entity.Chat
+import com.agathakazak.chatme.domain.entity.ChatDetail
 import com.agathakazak.chatme.domain.entity.Message
 import com.agathakazak.chatme.domain.entity.MessageRequest
 import com.agathakazak.chatme.domain.entity.Response
@@ -15,8 +16,7 @@ interface UserRepository {
     suspend fun getUserByPhoneNumber(phoneNumber: String): User
     suspend fun getUserById(userId: Int): User
     suspend fun getChatsForUser(userId: Int): List<Chat>
-    suspend fun getChat(senderId: Int, recipientId: Int): List<Message>
-    suspend fun sendMessage(messageRequest: MessageRequest)
+    suspend fun getChat(chatId: Int): ChatDetail
     suspend fun deleteMessages(ids: List<Int>)
     suspend fun readMessages(id: Int)
     suspend fun getUnreadedMessages(senderId: Int, recipientId: Int): List<Message>

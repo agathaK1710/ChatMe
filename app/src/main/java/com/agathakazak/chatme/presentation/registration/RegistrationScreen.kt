@@ -308,16 +308,13 @@ fun RegistrationScreen(
                         if (!firstNameError && !lastNameError && !phoneError
                             && !emailError && !passwordError && !repeatedPasswordError
                         ) {
-                            val color = context.resources.getIntArray(R.array.colors).random()
                             viewModel.registerUser(
                                 UserRegister(
                                     firstName,
                                     lastName,
                                     phoneNumber,
                                     email,
-                                    password,
-                                    null,
-                                    color
+                                    password
                                 )
                             )
                         }

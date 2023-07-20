@@ -8,6 +8,5 @@ data class UserRegisterDto(
     @SerializedName("phoneNumber") val phoneNumber: String,
     @SerializedName("email") val email: String,
     @SerializedName("password") val password: String,
-    @SerializedName("imageUrl") val imageUrl: String?,
-    @SerializedName("stubImageColor") val stubImageColor: Int
+    @SerializedName("imageUrl") val imageUrl: String?
 )

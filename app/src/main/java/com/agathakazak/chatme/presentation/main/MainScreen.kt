@@ -31,6 +31,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.agathakazak.chatme.domain.entity.ChatDetail
 import com.agathakazak.chatme.domain.entity.User
 import com.agathakazak.chatme.navigation.AppNavGraph
 import com.agathakazak.chatme.navigation.NavigationState
@@ -64,7 +65,7 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     )
     var search by rememberSaveable { mutableStateOf(false) }
     var searchText by rememberSaveable { mutableStateOf("") }
-    var user by rememberSaveable { mutableStateOf<User?>(null) }
+    var chat by rememberSaveable { mutableStateOf<ChatDetail?>(null) }
     var longClick by rememberSaveable { mutableStateOf(false) }
     val size by animateDpAsState(
         targetValue = if (menuState) 72.dp else 0.dp,
@@ -72,7 +73,7 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
     val alpha by animateFloatAsState(targetValue = if (menuState) 1f else 0f)
     Scaffold(
         topBar = {
-            if(logState.value == LoginState.IsLogged) {
+            if (logState.value == LoginState.IsLogged) {
                 MainTopBar(
                     currentDestination,
                     menuClick = {
@@ -88,7 +89,7 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                     },
                     focusRequester,
                     navigationState,
-                    user,
+                    chat,
                     longClick
                 )
             }
@@ -112,8 +113,8 @@ fun MainScreen(viewModelFactory: ViewModelFactory) {
                     changeMenuState = {
                         menuState = false
                     },
-                    setUser = {
-                        user = it
+                    setChat = {
+                        chat = it
                     },
                     setOnLongClick = {
                         longClick = it
@@ -140,7 +141,7 @@ private fun MainTopBar(
     changeSearchText: (String) -> Unit,
     focusRequester: FocusRequester,
     navigationState: NavigationState,
-    user: User?,
+    chat: ChatDetail?,
     longClick: Boolean
 ) {
     when (currentDestination?.route) {
@@ -163,8 +164,8 @@ private fun MainTopBar(
 
         Screen.Chat.route -> {
             if (!longClick) {
-                if (user != null) {
-                    MessagesTopBar(user) {
+                if (chat != null) {
+                    MessagesTopBar(chat) {
                         navigationState.navHostController.popBackStack()
                     }
                 } else {
@@ -190,7 +191,7 @@ private fun NavigationGraph(
     viewModelFactory: ViewModelFactory,
     logState: State<LoginState>,
     changeMenuState: () -> Unit,
-    setUser: (User) -> Unit,
+    setChat: (ChatDetail) -> Unit,
     setOnLongClick: (Boolean) -> Unit
 ) {
     val registrationViewModel: RegistrationViewModel = viewModel(factory = viewModelFactory)
@@ -227,9 +228,9 @@ private fun NavigationGraph(
             changeMenuState()
             MessagesScreen(
                 it,
-                setUser = { user ->
-                    setUser(
-                        user
+                setChat = { chat ->
+                    setChat(
+                        chat
                     )
                 },
                 setOnLongClick = {

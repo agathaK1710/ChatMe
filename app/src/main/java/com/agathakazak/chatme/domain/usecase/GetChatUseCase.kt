@@ -6,6 +6,6 @@ import javax.inject.Inject
 class GetChatUseCase @Inject constructor(
     private val repository: UserRepository
 ) {
-    suspend operator fun invoke(senderId: Int, recipientId: Int) =
-        repository.getChat(senderId, recipientId)
+    suspend operator fun invoke(chatId:Int) =
+        repository.getChat(chatId)
 }
