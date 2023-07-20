@@ -100,10 +100,10 @@ class MessagesViewModel @Inject constructor(
 
                         MessageType.DELETE -> {
                             val jsonArr = Gson().toJson(message.data)
-                            val listType: Type = object : TypeToken<List<Message>>() {}.type
-                            val selectedMessages: List<Message> = Gson().fromJson(jsonArr, listType)
-                            selectedMessages.forEach { selectedMessage ->
-                                _messages.removeIf { selectedMessage.id == it.id }
+                            val listType: Type = object : TypeToken<List<Int>>() {}.type
+                            val selectedMessagesIds: List<Int> = Gson().fromJson(jsonArr, listType)
+                            selectedMessagesIds.forEach { selectedMessageId ->
+                                _messages.removeIf { selectedMessageId == it.id }
                             }
                         }
 
@@ -114,7 +114,7 @@ class MessagesViewModel @Inject constructor(
                 }
             }
         }
-        return WebSocketClient.createWebSocket(userId, socketListener)
+        return WebSocketClient.createWebSocket(chatId, userId, socketListener)
     }
 
     fun unselectAllMessages() {
@@ -137,11 +137,10 @@ class MessagesViewModel @Inject constructor(
 
     fun deleteSelectedMessages() {
         viewModelScope.launch {
-            val selectedMessages = getSelectedMessages()
             socket.send(
                 Gson().toJson(
                     SocketMessage(
-                        selectedMessages,
+                        getSelectedMessages().map { it.id },
                         MessageType.DELETE
                     )
                 )

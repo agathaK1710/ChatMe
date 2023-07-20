@@ -13,9 +13,9 @@ object WebSocketClient {
         })
         .build()
 
-    fun createWebSocket(userId: Int, socketListener: WebSocketListener): WebSocket{
+    fun createWebSocket(chatId: Int, userId: Int, socketListener: WebSocketListener): WebSocket{
         return okHttpClient.newWebSocket(
-            Request.Builder().url("ws://10.0.2.2:8080/chat/${userId}").build(),
+            Request.Builder().url("ws://10.0.2.2:8080/chat/${chatId}/${userId}").build(),
             socketListener
         )
     }

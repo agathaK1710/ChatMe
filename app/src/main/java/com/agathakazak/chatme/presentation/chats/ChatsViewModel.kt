@@ -26,7 +26,7 @@ class ChatsViewModel @Inject constructor(
         loadAllChats()
     }
 
-    private fun loadAllChats() {
+    fun loadAllChats() {
         val sender = viewModelScope.async {
             getUserByTokenUseCase("Bearer " + getToken()!!)
         }

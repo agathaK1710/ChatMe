@@ -23,6 +23,7 @@ fun ChatScreen(
 
     when (val currentState = screenState.value) {
         is AllChatsScreenState.Chats -> {
+            chatViewModel.loadAllChats()
             LazyColumn {
                 items(items = currentState.chats, key = {it.id }) {
                     ChatItem(it, navigateToMessages)
